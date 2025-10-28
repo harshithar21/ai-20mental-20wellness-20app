@@ -74,7 +74,7 @@ export default function Chat() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || crisisActive) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -84,51 +84,87 @@ export default function Chat() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI analysis and response
-    setTimeout(() => {
-      // TODO: Integrate HuggingFace API for emotion/sentiment detection
-      const emotion = ["sadness", "joy", "anxiety"][
-        Math.floor(Math.random() * 3)
-      ];
-      const sentiment = ["positive", "negative", "neutral"][
-        Math.floor(Math.random() * 3)
-      ];
-      const severity = ["normal", "moderate"][Math.floor(Math.random() * 2)];
+    try {
+      // Analyze text using HuggingFace and keyword rules
+      const analysis = await analyzeText(userInput);
+      const crisisCheck = detectCrisis(userInput);
 
-      // Check for crisis keywords (simplified)
-      const crisisKeywords = [
-        "suicide",
-        "kill myself",
-        "no point",
-        "end it",
-      ];
-      const isCrisis = crisisKeywords.some((keyword) =>
-        input.toLowerCase().includes(keyword)
-      );
-
-      if (isCrisis) {
+      // Check if this is a crisis situation
+      if (crisisCheck.isCrisis) {
         setCrisisActive(true);
+
+        // Show crisis response immediately
+        const crisisMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: crisisCheck.emergencyResponse,
+          sender: "ai",
+          timestamp: new Date(),
+          emotion: analysis.emotion,
+          sentiment: analysis.sentiment,
+          severity: "crisis",
+          isCrisis: true,
+        };
+
+        setMessages((prev) => [...prev, crisisMessage]);
+        setIsLoading(false);
+        return;
       }
+
+      // Get supportive response based on emotion and intent
+      const supportiveResponse = getSupportiveResponse({
+        emotion: analysis.emotion,
+        sentiment: analysis.sentiment,
+        intent: analysis.intent,
+        isCrisis: false,
+      });
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: isCrisis
-          ? "I hear that you're going through something very difficult right now. Your life has value, and there are people who want to help. Please reach out to the crisis support number below. You're not alone."
-          : `Thank you for sharing that with me. I can sense you're feeling ${emotion}. I'm here to listen and support you. Would you like to talk more about what you're experiencing?`,
+        text: supportiveResponse,
         sender: "ai",
         timestamp: new Date(),
-        emotion,
-        sentiment,
-        severity,
-        isCrisis,
+        emotion: analysis.emotion,
+        sentiment: analysis.sentiment,
+        severity: crisisCheck.severity,
+        intent: analysis.intent,
+        isCrisis: false,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+
+      // If moderate severity, add a follow-up wellness message
+      if (crisisCheck.severity === "moderate") {
+        const wellnessMsg: Message = {
+          id: (Date.now() + 2).toString(),
+          text: `💚 ${getWellnessSuggestion(analysis.emotion)}`,
+          sender: "ai",
+          timestamp: new Date(),
+          emotion: analysis.emotion,
+        };
+
+        setTimeout(() => {
+          setMessages((prev) => [...prev, wellnessMsg]);
+        }, 800);
+      }
+
       setIsLoading(false);
-    }, 800);
+    } catch (error) {
+      console.error("Error processing message:", error);
+
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm having trouble processing your message right now. Please try again.",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+      setIsLoading(false);
+    }
   };
 
   return (
