@@ -239,6 +239,98 @@ async function getSentimentFromHF(text: string): Promise<string> {
   }
 }
 
+// Fallback emotion detection using keywords
+function detectEmotionFallback(text: string): string {
+  const lowerText = text.toLowerCase();
+
+  const emotionPatterns: Record<string, string[]> = {
+    sadness: [
+      "sad",
+      "unhappy",
+      "down",
+      "depressed",
+      "blue",
+      "heartbroken",
+      "miserable",
+      "awful",
+    ],
+    joy: [
+      "happy",
+      "great",
+      "love",
+      "wonderful",
+      "awesome",
+      "excellent",
+      "fantastic",
+      "amazing",
+    ],
+    anger: ["angry", "mad", "furious", "enraged", "outraged", "hate"],
+    anxiety: [
+      "anxious",
+      "nervous",
+      "panic",
+      "worried",
+      "uneasy",
+      "tense",
+      "jittery",
+    ],
+    fear: ["afraid", "scared", "frightened", "terrified", "fearful"],
+    loneliness: ["lonely", "alone", "isolated", "abandoned"],
+    stress: ["stressed", "pressure", "overwhelmed", "burdened", "strained"],
+    confusion: ["confused", "puzzled", "lost", "unclear"],
+    neutral: ["ok", "fine", "good", "normal", "alright"],
+  };
+
+  for (const [emotion, keywords] of Object.entries(emotionPatterns)) {
+    if (keywords.some((keyword) => lowerText.includes(keyword))) {
+      return emotion;
+    }
+  }
+
+  return "neutral";
+}
+
+// Fallback sentiment detection
+function detectSentimentFallback(text: string): string {
+  const lowerText = text.toLowerCase();
+
+  const positiveWords = [
+    "good",
+    "great",
+    "happy",
+    "love",
+    "wonderful",
+    "excellent",
+    "amazing",
+    "fantastic",
+    "blessed",
+    "grateful",
+  ];
+  const negativeWords = [
+    "bad",
+    "terrible",
+    "hate",
+    "awful",
+    "horrible",
+    "worst",
+    "sad",
+    "angry",
+    "frustrated",
+    "depressed",
+  ];
+
+  const positiveCount = positiveWords.filter((word) =>
+    lowerText.includes(word)
+  ).length;
+  const negativeCount = negativeWords.filter((word) =>
+    lowerText.includes(word)
+  ).length;
+
+  if (positiveCount > negativeCount) return "positive";
+  if (negativeCount > positiveCount) return "negative";
+  return "neutral";
+}
+
 // Main analysis function
 export async function analyzeText(text: string): Promise<EmotionAnalysisResult> {
   try {
@@ -248,26 +340,46 @@ export async function analyzeText(text: string): Promise<EmotionAnalysisResult> 
     // Detect intent (keyword-based)
     const intent = detectIntent(text);
 
-    // Get emotion and sentiment from HuggingFace (or fallback)
-    const [emotionResult, sentiment] = await Promise.all([
-      getEmotionFromHF(text),
-      getSentimentFromHF(text),
-    ]);
+    // Try to get emotion and sentiment from HuggingFace (with timeout)
+    let emotion = "neutral";
+    let sentiment = "neutral";
+    let confidence = 0;
+
+    if (HF_API_TOKEN) {
+      try {
+        const [emotionResult, sentimentResult] = await Promise.all([
+          getEmotionFromHF(text),
+          getSentimentFromHF(text),
+        ]);
+
+        emotion = emotionResult.emotion;
+        sentiment = sentimentResult;
+        confidence = emotionResult.confidence;
+      } catch (error) {
+        console.warn("HuggingFace API failed, using fallback detection", error);
+        emotion = detectEmotionFallback(text);
+        sentiment = detectSentimentFallback(text);
+      }
+    } else {
+      // No token - use fallback detection
+      emotion = detectEmotionFallback(text);
+      sentiment = detectSentimentFallback(text);
+    }
 
     return {
-      emotion: emotionResult.emotion,
+      emotion,
       sentiment,
       severity,
       intent,
-      confidence: emotionResult.confidence,
+      confidence,
     };
   } catch (error) {
     console.error("Error analyzing text:", error);
 
     // Graceful fallback
     return {
-      emotion: "neutral",
-      sentiment: "neutral",
+      emotion: detectEmotionFallback(text),
+      sentiment: detectSentimentFallback(text),
       severity: determineSeverity(text),
       intent: detectIntent(text),
       confidence: 0,
