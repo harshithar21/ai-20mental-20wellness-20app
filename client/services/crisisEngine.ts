@@ -39,14 +39,11 @@ const MODERATE_KEYWORDS = [
 
 // Grounding techniques
 const GROUNDING_TECHNIQUES = [
-  "5-4-3-2-1 Technique: Name 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste",
-  "Cold Water Technique: Splash cold water on your face or hold ice in your hands",
-  "Breathing Exercise: Breathe in for 4 counts, hold for 4, exhale for 4",
-  "Grounding with Your Senses: Focus on textures, sounds, or scents around you",
-  "Physical Activity: Go for a walk, do stretches, or any physical movement",
-  "Progressive Muscle Relaxation: Tense and release different muscle groups",
-  "Mindfulness Meditation: Focus on the present moment",
-  "Connect with Someone: Call or text a trusted friend or family member",
+  "Name 5 things you can see around you.",
+  "4 things you can touch.",
+  "3 things you can hear.",
+  "2 things you can smell.",
+  "1 thing you can taste.",
 ];
 
 // Emergency helpline numbers (India focus, but can be expanded)
@@ -57,51 +54,40 @@ const HELPLINE_NUMBERS = {
   LIFELINE: "1800 200 8332",
 };
 
+// Detect crisis based on keywords
 export function detectCrisis(text: string): CrisisDetectionResult {
   const lowerText = text.toLowerCase();
   const detectedIndicators: string[] = [];
-  let severity: "low" | "medium" | "high" = "low";
+  let severity: "normal" | "moderate" | "crisis" = "normal";
 
-  // Check for high-risk indicators
-  for (const indicator of CRISIS_INDICATORS.highRisk) {
-    if (lowerText.includes(indicator)) {
-      detectedIndicators.push(indicator);
-      severity = "high";
+  // Check for crisis keywords (highest priority)
+  for (const keyword of CRISIS_KEYWORDS) {
+    if (lowerText.includes(keyword)) {
+      detectedIndicators.push(keyword);
+      severity = "crisis";
     }
   }
 
-  // Check for medium-risk indicators (only if not already high)
-  if (severity !== "high") {
-    for (const indicator of CRISIS_INDICATORS.mediumRisk) {
-      if (lowerText.includes(indicator)) {
-        detectedIndicators.push(indicator);
-        severity = "medium";
+  // Check for moderate keywords (only if not already crisis)
+  if (severity !== "crisis") {
+    for (const keyword of MODERATE_KEYWORDS) {
+      if (lowerText.includes(keyword)) {
+        detectedIndicators.push(keyword);
+        severity = "moderate";
       }
     }
   }
 
-  // Check for low-risk indicators (only if not already higher)
-  if (severity === "low") {
-    for (const indicator of CRISIS_INDICATORS.lowRisk) {
-      if (lowerText.includes(indicator)) {
-        detectedIndicators.push(indicator);
-        severity = "low";
-      }
-    }
-  }
-
-  const isCrisis = severity === "high";
+  const isCrisis = severity === "crisis";
 
   let emergencyResponse = "";
-  if (severity === "high") {
+  if (severity === "crisis") {
+    emergencyResponse = `I hear you. Your feelings are valid and you are strong for sharing this. You deserve safety and care. Please contact AASRA suicide prevention helpline: ${HELPLINE_NUMBERS.AASRA}. You are important.`;
+  } else if (severity === "moderate") {
     emergencyResponse =
-      "I'm deeply concerned about what you're sharing. Your life has value, and there are people who want to help you right now. Please reach out to a crisis helpline immediately. You don't have to face this alone.";
-  } else if (severity === "medium") {
-    emergencyResponse =
-      "I hear that you're in significant pain. What you're feeling is important, and you deserve support. Please consider reaching out to someone you trust or contacting a helpline to talk through this.";
+      "I hear that you're struggling with difficult feelings. Your well-being matters. Would you like to talk more, or would it help to reach out to someone you trust?";
   } else {
-    emergencyResponse =
-      "Thank you for sharing with me. I'm here to listen and support you through this.";
+    emergencyResponse = "";
   }
 
   return {
@@ -110,7 +96,7 @@ export function detectCrisis(text: string): CrisisDetectionResult {
     indicators: [...new Set(detectedIndicators)],
     helplineNumber: HELPLINE_NUMBERS.AASRA,
     emergencyResponse,
-    groundingTechniques: isCrisis ? GROUNDING_TECHNIQUES.slice(0, 4) : [],
+    groundingTechniques: isCrisis ? GROUNDING_TECHNIQUES : [],
   };
 }
 
