@@ -1,60 +1,41 @@
 // Crisis Safety Engine
-// Detects crisis indicators and provides appropriate responses
+// Detects crisis indicators using keyword rules provided by user
 
 export interface CrisisDetectionResult {
   isCrisis: boolean;
-  severity: "low" | "medium" | "high";
+  severity: "normal" | "moderate" | "crisis";
   indicators: string[];
   helplineNumber: string;
   emergencyResponse: string;
   groundingTechniques: string[];
 }
 
-// Crisis keywords and phrases
-const CRISIS_INDICATORS = {
-  highRisk: [
-    "suicide",
-    "suicidal thoughts",
-    "kill myself",
-    "kill myself",
-    "end it all",
-    "no point",
-    "don't want to live",
-    "want to hurt myself",
-    "self harm",
-    "self-harm",
-    "i should die",
-    "i want to die",
-    "i'm going to kill myself",
-    "planning to kill myself",
-    "method to kill myself",
-  ],
-  mediumRisk: [
-    "tired of living",
-    "life is meaningless",
-    "hopeless",
-    "hopelessness",
-    "useless",
-    "don't care anymore",
-    "don't want to exist",
-    "pain too much",
-    "can't take it",
-    "devastated",
-    "desperate",
-    "severe depression",
-    "panic attack",
-  ],
-  lowRisk: [
-    "sad",
-    "depressed",
-    "anxious",
-    "stressed",
-    "overwhelmed",
-    "struggling",
-    "not okay",
-    "hurting",
-  ],
-};
+// Crisis keywords - High Risk (from user specification)
+const CRISIS_KEYWORDS = [
+  "kill myself",
+  "suicide",
+  "die",
+  "end my life",
+  "worthless",
+  "no reason to live",
+  "cut myself",
+  "jump off",
+  "self harm",
+  "hurt myself",
+];
+
+// Moderate warning keywords - (from user specification)
+const MODERATE_KEYWORDS = [
+  "depressed",
+  "hopeless",
+  "scared",
+  "lonely",
+  "anxious",
+  "panic",
+  "stress",
+  "crying",
+  "broken",
+];
 
 // Grounding techniques
 const GROUNDING_TECHNIQUES = [
