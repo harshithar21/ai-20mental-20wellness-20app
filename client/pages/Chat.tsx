@@ -172,55 +172,84 @@ export default function Chat() {
       <div className="min-h-screen bg-background">
         {/* Crisis Alert */}
         {crisisActive && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-lg border-2 border-crisis">
               <div className="flex items-center gap-3 mb-4">
-                <AlertTriangle className="h-6 w-6 text-crisis" />
+                <Heart className="h-6 w-6 text-crisis animate-pulse" />
                 <h2 className="text-xl font-bold text-foreground">
-                  We Care About You
+                  You Matter & You're Not Alone
                 </h2>
               </div>
 
               <p className="text-muted-foreground mb-6">
-                If you're having thoughts of suicide, please reach out for help
-                immediately. You're not alone, and support is available.
+                I hear that you're going through something very difficult right
+                now. Your life has value, and there are people who want to help
+                you.
               </p>
 
               <div className="space-y-3 mb-6 p-4 bg-red-50 rounded-lg border border-red-200">
-                <p className="font-semibold text-foreground">Crisis Support:</p>
+                <p className="font-semibold text-foreground">
+                  Crisis Support Helpline:
+                </p>
                 <p className="text-lg font-bold text-crisis">
-                  AASRA: +91 9820466726
+                  📞 AASRA: +91 9820466726
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Available 24/7. Your call is free and confidential.
+                  Available 24/7 • Free & Confidential • No judgment
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  They are trained to help and want to listen to you.
                 </p>
               </div>
 
-              <div className="space-y-2 mb-6 text-sm text-muted-foreground">
-                <p className="font-semibold text-foreground mb-2">
-                  Grounding Techniques:
+              <div className="space-y-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="font-semibold text-foreground mb-3">
+                  Let's Ground You Now:
                 </p>
-                <ul className="space-y-1">
-                  <li>
-                    • Name 5 things you can see around you right now
-                  </li>
-                  <li>
-                    • Feel your feet on the ground, take slow breaths
-                  </li>
-                  <li>
-                    • Hold an ice cube or splash cold water on your face
-                  </li>
-                  <li>
-                    • Call a trusted friend or family member
-                  </li>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600 mt-0.5">5</span>
+                    <span>things you can see around you</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600 mt-0.5">4</span>
+                    <span>things you can touch</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600 mt-0.5">3</span>
+                    <span>things you can hear</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600 mt-0.5">2</span>
+                    <span>things you can smell</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="font-bold text-blue-600 mt-0.5">1</span>
+                    <span>thing you can taste</span>
+                  </p>
+                </div>
+                <p className="text-xs text-blue-600 mt-3 italic">
+                  This brings you back to the present moment. You're safe right
+                  now.
+                </p>
+              </div>
+
+              <div className="space-y-2 mb-6">
+                <p className="font-semibold text-foreground text-sm">
+                  Also Consider:
+                </p>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>💙 Call a trusted friend or family member</li>
+                  <li>🏥 Go to your nearest emergency room</li>
+                  <li>📱 Text "HELLO" to 741741 (Crisis Text Line)</li>
                 </ul>
               </div>
 
               <Button
                 onClick={() => setCrisisActive(false)}
-                className="w-full bg-primary hover:bg-wellness-600"
+                className="w-full bg-primary hover:bg-wellness-600 h-11"
               >
-                I'm Safe for Now
+                I'm Safe & Want to Talk
               </Button>
             </div>
           </div>
