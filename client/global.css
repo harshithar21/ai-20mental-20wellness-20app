@@ -74,41 +74,59 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 220 13% 12%;
+    --foreground: 0 0% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 13% 18%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 13% 18%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 186 70% 50%;
+    --primary-foreground: 220 13% 12%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 280 60% 55%;
+    --secondary-foreground: 220 13% 12%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 13% 25%;
+    --muted-foreground: 220 8% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 186 70% 50%;
+    --accent-foreground: 220 13% 12%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 13% 12%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 220 13% 25%;
+    --input: 220 13% 20%;
+    --ring: 186 70% 50%;
+
+    --sidebar-background: 220 13% 15%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 186 70% 50%;
+    --sidebar-primary-foreground: 220 13% 12%;
+    --sidebar-accent: 220 13% 25%;
+    --sidebar-accent-foreground: 186 70% 50%;
+    --sidebar-border: 220 13% 22%;
+    --sidebar-ring: 186 70% 50%;
+
+    /* Dark mode wellness colors */
+    --wellness-50: 186 100% 20%;
+    --wellness-100: 186 86% 25%;
+    --wellness-200: 186 75% 30%;
+    --wellness-300: 186 70% 40%;
+    --wellness-400: 186 70% 50%;
+    --wellness-500: 186 70% 55%;
+    --wellness-600: 186 75% 65%;
+    --wellness-700: 186 80% 75%;
+    --wellness-800: 186 85% 85%;
+    --wellness-900: 186 90% 92%;
+
+    --calm: 186 70% 50%;
+    --energize: 48 95% 55%;
+    --focus: 280 60% 60%;
+    --crisis: 0 84% 65%;
   }
 }
 
