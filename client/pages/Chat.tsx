@@ -2,8 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, AlertTriangle, Lightbulb } from "lucide-react";
+import { Send, AlertTriangle, Lightbulb, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { analyzeText } from "@/services/huggingface";
+import { detectCrisis } from "@/services/crisisEngine";
+import {
+  getSupportiveResponse,
+  getWellnessSuggestion,
+} from "@/services/supportiveResponses";
 
 interface Message {
   id: string;
@@ -25,7 +31,11 @@ const emotionColors: Record<string, string> = {
   joy: "bg-yellow-100 text-yellow-800",
   stress: "bg-rose-100 text-rose-800",
   confusion: "bg-amber-100 text-amber-800",
+  fear: "bg-indigo-100 text-indigo-800",
   neutral: "bg-gray-100 text-gray-800",
+  love: "bg-pink-100 text-pink-800",
+  surprise: "bg-cyan-100 text-cyan-800",
+  disgust: "bg-green-100 text-green-800",
 };
 
 const sentimentColors: Record<string, string> = {
