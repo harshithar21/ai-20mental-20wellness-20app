@@ -2,8 +2,8 @@
 // TODO: Replace with your Supabase project URL and anon key
 // You can find these in your Supabase project settings
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://your-project.supabase.co";
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://your-project.supabase.co";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 // Initialize Supabase client
 // This will be used for authentication and database operations
