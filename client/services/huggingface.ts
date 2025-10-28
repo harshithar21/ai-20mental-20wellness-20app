@@ -1,7 +1,7 @@
 // HuggingFace API service for emotion and sentiment analysis
 // Uses advanced models: GoEmotions and Twitter RoBERTa sentiment
 
-const HF_API_TOKEN = process.env.VITE_HF_API_TOKEN || "";
+const HF_API_TOKEN = import.meta.env.VITE_HF_API_TOKEN || "";
 
 export interface EmotionAnalysisResult {
   emotion: string;
