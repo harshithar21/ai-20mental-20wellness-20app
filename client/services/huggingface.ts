@@ -1,5 +1,5 @@
 // HuggingFace API service for emotion and sentiment analysis
-// TODO: Add your HuggingFace API token to environment variables
+// Uses advanced models: GoEmotions and Twitter RoBERTa sentiment
 
 const HF_API_TOKEN = process.env.VITE_HF_API_TOKEN || "";
 
@@ -7,177 +7,270 @@ export interface EmotionAnalysisResult {
   emotion: string;
   sentiment: string;
   severity: "normal" | "moderate" | "crisis";
-  intent?: string;
+  intent: string;
   confidence: number;
 }
 
-// GoEmotions model emotions
-const EMOTIONS = [
-  "sadness",
-  "joy",
-  "anger",
-  "fear",
-  "disgust",
-  "surprise",
-  "love",
-  "neutral",
-  "anxiety",
-  "loneliness",
-  "stress",
-  "confusion",
-];
+// GoEmotions emotion categories
+const EMOTION_LABELS = {
+  sadness: "sadness",
+  joy: "joy",
+  anger: "anger",
+  fear: "fear",
+  disgust: "disgust",
+  surprise: "surprise",
+  love: "love",
+  neutral: "neutral",
+  anxiety: "anxiety",
+  loneliness: "loneliness",
+  stress: "stress",
+  confusion: "confusion",
+};
 
-// Crisis keywords to detect severity
+// Crisis severity keywords - HIGH RISK
 const CRISIS_KEYWORDS = [
+  "kill myself",
   "suicide",
-  "suicidal",
-  "kill myself",
-  "kill myself",
-  "end it all",
-  "no point",
-  "don't want to live",
-  "want to hurt myself",
-  "harm myself",
+  "die",
+  "end my life",
+  "worthless",
+  "no reason to live",
+  "cut myself",
+  "jump off",
   "self harm",
-  "i should die",
-  "i want to die",
+  "hurt myself",
 ];
 
-// Helper function to determine sentiment from emotion
-function emotionToSentiment(emotion: string): string {
-  const positive = ["joy", "love", "surprise"];
-  const negative = ["sadness", "anger", "fear", "disgust", "anxiety", "stress", "confusion", "loneliness"];
+// Moderate warning keywords
+const MODERATE_KEYWORDS = [
+  "depressed",
+  "hopeless",
+  "scared",
+  "lonely",
+  "anxious",
+  "panic",
+  "stress",
+  "crying",
+  "broken",
+];
 
-  if (positive.includes(emotion.toLowerCase())) return "positive";
-  if (negative.includes(emotion.toLowerCase())) return "negative";
-  return "neutral";
-}
+// Intent classification rules
+const INTENT_PATTERNS = {
+  ask_advice: [
+    "what should i do",
+    "suggest",
+    "help me solve",
+    "how can i",
+    "what can i do",
+    "advice",
+    "tips",
+  ],
+  venting: [
+    "i hate my life",
+    "everything sucks",
+    "everything is terrible",
+    "why me",
+    "fed up",
+    "sick of",
+  ],
+  seeking_support: [
+    "please help",
+    "i need someone",
+    "i feel",
+    "im struggling",
+    "i'm struggling",
+    "help me",
+    "support",
+    "i need help",
+  ],
+  general: ["tell me", "what", "how", "why"],
+};
 
-// Helper function to determine severity
+// Detect crisis severity from keywords
 function determineSeverity(text: string): "normal" | "moderate" | "crisis" {
   const lowerText = text.toLowerCase();
 
-  // Check for crisis keywords
+  // Check for crisis keywords first (highest priority)
   if (CRISIS_KEYWORDS.some((keyword) => lowerText.includes(keyword))) {
     return "crisis";
   }
 
-  // Check for moderate severity indicators
-  const moderateKeywords = ["overwhelmed", "depressed", "desperate", "hopeless", "broken"];
-  if (moderateKeywords.some((keyword) => lowerText.includes(keyword))) {
+  // Check for moderate keywords
+  if (MODERATE_KEYWORDS.some((keyword) => lowerText.includes(keyword))) {
     return "moderate";
   }
 
   return "normal";
 }
 
-// Main function to analyze text
-export async function analyzeText(text: string): Promise<EmotionAnalysisResult> {
+// Classify user intent
+function detectIntent(text: string): string {
+  const lowerText = text.toLowerCase();
+
+  if (INTENT_PATTERNS.ask_advice.some((pattern) => lowerText.includes(pattern))) {
+    return "ask_advice";
+  }
+  if (INTENT_PATTERNS.venting.some((pattern) => lowerText.includes(pattern))) {
+    return "venting";
+  }
+  if (INTENT_PATTERNS.seeking_support.some((pattern) => lowerText.includes(pattern))) {
+    return "seeking_support";
+  }
+
+  return "general_conversation";
+}
+
+// Map HuggingFace emotion labels to our standard emotions
+function mapEmotionLabel(label: string): string {
+  const lowerLabel = label.toLowerCase();
+
+  // Direct matches
+  if (EMOTION_LABELS[lowerLabel as keyof typeof EMOTION_LABELS]) {
+    return lowerLabel;
+  }
+
+  // Map similar emotions
+  const emotionMap: Record<string, string> = {
+    admiration: "joy",
+    amusement: "joy",
+    approval: "joy",
+    excitement: "joy",
+    gratitude: "joy",
+    pride: "joy",
+    relief: "joy",
+    trust: "love",
+    caring: "love",
+    desire: "love",
+    remorse: "sadness",
+    sorrow: "sadness",
+    suffering: "sadness",
+    shame: "sadness",
+    grief: "sadness",
+    disappointment: "sadness",
+    embarrassment: "sadness",
+    confusion: "confusion",
+    realization: "confusion",
+    optimism: "joy",
+    nervousness: "anxiety",
+    annoyance: "anger",
+    disapproval: "anger",
+  };
+
+  return emotionMap[lowerLabel] || "neutral";
+}
+
+// Call HuggingFace Emotion API
+async function getEmotionFromHF(text: string): Promise<{ emotion: string; confidence: number }> {
   try {
-    // TODO: Replace with actual HuggingFace API call when token is available
-    // For now, return mock data based on keywords
-
-    const severity = determineSeverity(text);
-
-    // Simple keyword-based emotion detection for now
-    const lowerText = text.toLowerCase();
-    let detectedEmotion = "neutral";
-
-    if (lowerText.includes("sad") || lowerText.includes("unhappy") || lowerText.includes("down")) {
-      detectedEmotion = "sadness";
-    } else if (lowerText.includes("happy") || lowerText.includes("great") || lowerText.includes("love")) {
-      detectedEmotion = "joy";
-    } else if (lowerText.includes("angry") || lowerText.includes("mad") || lowerText.includes("furious")) {
-      detectedEmotion = "anger";
-    } else if (lowerText.includes("afraid") || lowerText.includes("scared") || lowerText.includes("worried")) {
-      detectedEmotion = "fear";
-    } else if (lowerText.includes("anxious") || lowerText.includes("nervous") || lowerText.includes("panic")) {
-      detectedEmotion = "anxiety";
-    } else if (lowerText.includes("lonely") || lowerText.includes("alone")) {
-      detectedEmotion = "loneliness";
-    } else if (lowerText.includes("stressed") || lowerText.includes("pressure")) {
-      detectedEmotion = "stress";
-    } else if (lowerText.includes("confused") || lowerText.includes("confused")) {
-      detectedEmotion = "confusion";
+    if (!HF_API_TOKEN) {
+      console.warn("HF_API_TOKEN not set, using fallback emotion detection");
+      return { emotion: "neutral", confidence: 0 };
     }
 
-    const sentiment = emotionToSentiment(detectedEmotion);
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/joeddav/distilbert-base-uncased-go-emotions-student",
+      {
+        headers: { Authorization: `Bearer ${HF_API_TOKEN}` },
+        method: "POST",
+        body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HF API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const emotions = data[0] as Array<{ label: string; score: number }>;
+      emotions.sort((a, b) => b.score - a.score);
+
+      const topEmotion = emotions[0];
+      const mappedEmotion = mapEmotionLabel(topEmotion.label);
+
+      return {
+        emotion: mappedEmotion,
+        confidence: topEmotion.score,
+      };
+    }
+
+    return { emotion: "neutral", confidence: 0 };
+  } catch (error) {
+    console.error("Error getting emotion from HF:", error);
+    return { emotion: "neutral", confidence: 0 };
+  }
+}
+
+// Call HuggingFace Sentiment API
+async function getSentimentFromHF(text: string): Promise<string> {
+  try {
+    if (!HF_API_TOKEN) {
+      console.warn("HF_API_TOKEN not set, using fallback sentiment detection");
+      return "neutral";
+    }
+
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/cardiffnlp/twitter-roberta-base-sentiment-latest",
+      {
+        headers: { Authorization: `Bearer ${HF_API_TOKEN}` },
+        method: "POST",
+        body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HF API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const sentiments = data[0] as Array<{ label: string; score: number }>;
+      sentiments.sort((a, b) => b.score - a.score);
+
+      return sentiments[0].label.toLowerCase();
+    }
+
+    return "neutral";
+  } catch (error) {
+    console.error("Error getting sentiment from HF:", error);
+    return "neutral";
+  }
+}
+
+// Main analysis function
+export async function analyzeText(text: string): Promise<EmotionAnalysisResult> {
+  try {
+    // Determine severity first (keyword-based, most reliable)
+    const severity = determineSeverity(text);
+
+    // Detect intent (keyword-based)
+    const intent = detectIntent(text);
+
+    // Get emotion and sentiment from HuggingFace (or fallback)
+    const [emotionResult, sentiment] = await Promise.all([
+      getEmotionFromHF(text),
+      getSentimentFromHF(text),
+    ]);
 
     return {
-      emotion: detectedEmotion,
+      emotion: emotionResult.emotion,
       sentiment,
       severity,
-      intent: detectIntent(text),
-      confidence: 0.85,
+      intent,
+      confidence: emotionResult.confidence,
     };
   } catch (error) {
     console.error("Error analyzing text:", error);
 
-    // Fallback response
+    // Graceful fallback
     return {
       emotion: "neutral",
       sentiment: "neutral",
-      severity: "normal",
-      confidence: 0,
-    };
-  }
-}
-
-// Helper function to detect user intent
-function detectIntent(text: string): string {
-  const lowerText = text.toLowerCase();
-
-  if (lowerText.includes("what") || lowerText.includes("how") || lowerText.includes("why")) {
-    return "seek_advice";
-  }
-  if (lowerText.includes("i need") || lowerText.includes("help") || lowerText.includes("support")) {
-    return "seek_support";
-  }
-  if (lowerText.includes("just") && lowerText.includes("say")) {
-    return "venting";
-  }
-
-  return "general";
-}
-
-// Actual HuggingFace API call (commented out for now)
-/*
-export async function analyzeTextWithHF(text: string): Promise<EmotionAnalysisResult> {
-  try {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/michellejieli/emotion_text_classifier",
-      {
-        headers: { Authorization: `Bearer ${HF_API_TOKEN}` },
-        method: "POST",
-        body: JSON.stringify({ inputs: text }),
-      }
-    );
-
-    const data = await response.json();
-
-    // Parse HuggingFace response
-    const emotions = data[0] as Array<{ label: string; score: number }>;
-    emotions.sort((a, b) => b.score - a.score);
-
-    const topEmotion = emotions[0];
-    const sentiment = emotionToSentiment(topEmotion.label);
-    const severity = determineSeverity(text);
-
-    return {
-      emotion: topEmotion.label,
-      sentiment,
-      severity,
+      severity: determineSeverity(text),
       intent: detectIntent(text),
-      confidence: topEmotion.score,
-    };
-  } catch (error) {
-    console.error("HuggingFace API error:", error);
-    return {
-      emotion: "neutral",
-      sentiment: "neutral",
-      severity: "normal",
       confidence: 0,
     };
   }
 }
-*/
