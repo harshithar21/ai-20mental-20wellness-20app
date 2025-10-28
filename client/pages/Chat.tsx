@@ -347,17 +347,20 @@ export default function Chat() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Wellness Tips */}
+          {/* Wellness Tips - Dynamic based on recent messages */}
           {!crisisActive && (
             <div className="mb-6 p-4 bg-wellness-50 border border-wellness-200 rounded-lg flex gap-3">
               <Lightbulb className="h-5 w-5 text-wellness-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-semibold text-wellness-700 mb-1">
-                  Wellness Tip
+                  💚 Wellness Reminder
                 </p>
                 <p className="text-wellness-600">
-                  Taking deep breaths can help calm your nervous system. Try
-                  breathing in for 4 counts, holding for 4, and exhaling for 4.
+                  {messages.length > 1 && messages[messages.length - 1].sender === "ai"
+                    ? messages[messages.length - 1].emotion
+                      ? getWellnessSuggestion(messages[messages.length - 1].emotion || "neutral")
+                      : "Remember to take care of yourself. You deserve compassion, especially from yourself."
+                    : "Taking care of your mental health is important. You're doing great by reaching out."}
                 </p>
               </div>
             </div>
