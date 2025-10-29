@@ -267,7 +267,7 @@ export default function Journal() {
             <h2 className="text-2xl font-bold text-foreground mb-4">
               Your Entries
             </h2>
-            {entries.length === 0 ? (
+            {journalEntries.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground text-lg mb-4">
                   No entries yet. Start journaling to build your wellness habit!
@@ -275,7 +275,7 @@ export default function Journal() {
               </div>
             ) : (
               <div className="space-y-4">
-                {entries.map((entry) => (
+                {journalEntries.map((entry) => (
                   <Card
                     key={entry.id}
                     className="p-6 hover:shadow-md-wellness transition-shadow"
