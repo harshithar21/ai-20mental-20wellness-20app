@@ -1,18 +1,5 @@
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from "recharts";
 import { TrendingUp, Heart, Brain, Zap, Trophy, ArrowUp, ArrowDown } from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 
