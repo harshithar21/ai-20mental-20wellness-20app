@@ -39,26 +39,12 @@ const moodOptions = [
 ];
 
 export default function Journal() {
-  const [entries, setEntries] = useState<JournalEntry[]>([
-    {
-      id: "1",
-      date: "Jan 15, 2024",
-      title: "Great day at work",
-      content:
-        "Today was productive. I completed the project I was working on and got positive feedback from my team. Feeling accomplished and grateful.",
-      moodRating: 7,
-      moodTag: "Excellent",
-    },
-    {
-      id: "2",
-      date: "Jan 14, 2024",
-      title: "Feeling anxious",
-      content:
-        "Had a difficult conversation today. Feeling anxious about the outcome, but I'm trying to trust the process. Went for a walk which helped.",
-      moodRating: 4,
-      moodTag: "Okay",
-    },
-  ]);
+  const {
+    journalEntries,
+    addJournalEntry,
+    deleteJournalEntry,
+    getCurrentStreak,
+  } = useAppContext();
 
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -66,8 +52,8 @@ export default function Journal() {
   const [moodRating, setMoodRating] = useState(6);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
 
-  const streak = 7;
-  const totalEntries = entries.length;
+  const streak = getCurrentStreak();
+  const totalEntries = journalEntries.length;
 
   const handleAddEntry = () => {
     if (title.trim() || content.trim()) {
@@ -86,7 +72,7 @@ export default function Journal() {
         moodTag: moodOptions[moodRating - 1].label.split(" ")[1],
       };
 
-      setEntries([newEntry, ...entries]);
+      addJournalEntry(newEntry);
       setTitle("");
       setContent("");
       setMoodRating(6);
@@ -95,7 +81,7 @@ export default function Journal() {
   };
 
   const handleDeleteEntry = (id: string) => {
-    setEntries(entries.filter((entry) => entry.id !== id));
+    deleteJournalEntry(id);
   };
 
   const getMoodColor = (rating: number) => {
