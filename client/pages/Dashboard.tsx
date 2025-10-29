@@ -153,71 +153,42 @@ export default function Dashboard() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Professional Mood Trend Chart */}
+            {/* Professional Mood Trend Chart - CSS Based */}
             <div className="lg:col-span-2 bg-card rounded-lg p-8 border border-border shadow-subtle">
               <h2 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
                 Weekly Mood Trend
               </h2>
-              <ResponsiveContainer width="100%" height={350}>
-                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="5%"
-                        stopColor="hsl(var(--primary))"
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="hsl(var(--primary))"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    stroke="hsl(var(--muted-foreground))"
-                    style={{ fontSize: "12px" }}
-                  />
-                  <YAxis
-                    domain={[0, 10]}
-                    stroke="hsl(var(--muted-foreground))"
-                    label={{ value: "Mood Score", angle: -90, position: "insideLeft" }}
-                    style={{ fontSize: "12px" }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                      padding: "12px",
-                    }}
-                    cursor={{ stroke: "hsl(var(--primary))", strokeWidth: 2 }}
-                    formatter={(value) => [`${value}/10`, "Mood"]}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="mood"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={3}
-                    fill="url(#moodGradient)"
-                    dot={{
-                      fill: "hsl(var(--primary))",
-                      r: 6,
-                      strokeWidth: 2,
-                      stroke: "hsl(var(--card))",
-                    }}
-                    activeDot={{ r: 8 }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+
+              {/* Simple SVG Mood Chart */}
+              <div className="w-full h-80 flex items-end justify-between gap-2 px-4">
+                {chartData.map((entry, i) => {
+                  const height = (entry.mood / 10) * 100;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center">
+                      <div className="w-full flex items-end justify-center h-64">
+                        <div
+                          className="w-full bg-gradient-to-t from-primary to-primary/40 rounded-t-lg transition-all hover:from-primary/80 hover:to-primary/60"
+                          style={{ height: `${height}%` }}
+                          title={`${entry.date}: ${entry.mood}/10`}
+                        />
+                      </div>
+                      <div className="text-xs font-medium text-muted-foreground mt-2 truncate w-full text-center">
+                        {entry.name}
+                      </div>
+                      <div className="text-sm font-bold text-primary mt-1">
+                        {entry.mood}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Mood Range:</span> Your mood fluctuates between {Math.min(...chartData.map(d => d.mood))}/10 and {Math.max(...chartData.map(d => d.mood))}/10
+                </p>
+              </div>
             </div>
 
             {/* Top Emotions */}
