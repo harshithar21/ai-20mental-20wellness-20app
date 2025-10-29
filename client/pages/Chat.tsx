@@ -2,7 +2,18 @@ import { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, AlertTriangle, Lightbulb, Heart } from "lucide-react";
+import {
+  Send,
+  AlertTriangle,
+  Lightbulb,
+  Heart,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  RotateCcw,
+  Sparkles,
+  Brain,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { analyzeText } from "@/services/huggingface";
 import { detectCrisis } from "@/services/crisisEngine";
@@ -10,6 +21,7 @@ import {
   getSupportiveResponse,
   getWellnessSuggestion,
 } from "@/services/supportiveResponses";
+import { useAppContext } from "@/contexts/AppContext";
 
 interface Message {
   id: string;
@@ -21,47 +33,50 @@ interface Message {
   severity?: string;
   intent?: string;
   isCrisis?: boolean;
+  isTyping?: boolean;
 }
 
-const emotionColors: Record<string, string> = {
-  sadness: "bg-blue-100 text-blue-800",
-  anger: "bg-red-100 text-red-800",
-  anxiety: "bg-orange-100 text-orange-800",
-  loneliness: "bg-purple-100 text-purple-800",
-  joy: "bg-yellow-100 text-yellow-800",
-  stress: "bg-rose-100 text-rose-800",
-  confusion: "bg-amber-100 text-amber-800",
-  fear: "bg-indigo-100 text-indigo-800",
-  neutral: "bg-gray-100 text-gray-800",
-  love: "bg-pink-100 text-pink-800",
-  surprise: "bg-cyan-100 text-cyan-800",
-  disgust: "bg-green-100 text-green-800",
+const emotionEmojis: Record<string, string> = {
+  sadness: "😢",
+  anger: "😠",
+  anxiety: "😟",
+  loneliness: "🥺",
+  joy: "😊",
+  stress: "😰",
+  confusion: "🤔",
+  fear: "😨",
+  neutral: "😐",
+  love: "❤️",
+  surprise: "😮",
+  disgust: "🤢",
 };
 
-const sentimentColors: Record<string, string> = {
-  positive: "bg-wellness-100 text-wellness-700",
-  neutral: "bg-gray-100 text-gray-700",
-  negative: "bg-red-100 text-red-700",
-};
-
-const severityColors: Record<string, string> = {
-  normal: "bg-green-100 text-green-700",
-  moderate: "bg-amber-100 text-amber-700",
-  crisis: "bg-red-100 text-red-700",
-};
+const suggestedPrompts = [
+  "I'm feeling anxious about work",
+  "I've had a great day!",
+  "Help me manage my stress",
+  "I need grounding techniques",
+  "What can improve my mood?",
+  "I'm struggling with loneliness",
+];
 
 export default function Chat() {
+  const { addChatMessage } = useAppContext();
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      text: "Hello! I'm MindCare, your AI wellness companion. I'm here to listen and support you. What's on your mind today?",
+      id: "welcome",
+      text: "Hello! 💙 I'm MindCare, your AI wellness companion. I'm here to listen without judgment and support you through anything you're feeling. Whether you're celebrating a win, working through a challenge, or just need to talk—I'm here for you. What's on your mind today?",
       sender: "ai",
       timestamp: new Date(),
+      emotion: "joy",
     },
   ]);
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [crisisActive, setCrisisActive] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -71,6 +86,12 @@ export default function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleCopyMessage = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,33 +109,44 @@ export default function Chat() {
     setInput("");
     setIsLoading(true);
 
+    // Add typing indicator
+    const typingId = `typing-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: typingId,
+        text: "",
+        sender: "ai",
+        timestamp: new Date(),
+        isTyping: true,
+      },
+    ]);
+
     try {
-      // Analyze text using HuggingFace and keyword rules
       const analysis = await analyzeText(userInput);
       const crisisCheck = detectCrisis(userInput);
 
-      // Check if this is a crisis situation
+      // Simulate typing delay
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      // Remove typing indicator
+      setMessages((prev) => prev.filter((m) => m.id !== typingId));
+
       if (crisisCheck.isCrisis) {
         setCrisisActive(true);
-
-        // Show crisis response immediately
         const crisisMessage: Message = {
           id: (Date.now() + 1).toString(),
           text: crisisCheck.emergencyResponse,
           sender: "ai",
           timestamp: new Date(),
-          emotion: analysis.emotion,
-          sentiment: analysis.sentiment,
           severity: "crisis",
           isCrisis: true,
         };
-
         setMessages((prev) => [...prev, crisisMessage]);
         setIsLoading(false);
         return;
       }
 
-      // Get supportive response based on emotion and intent
       const supportiveResponse = getSupportiveResponse({
         emotion: analysis.emotion,
         sentiment: analysis.sentiment,
@@ -131,13 +163,22 @@ export default function Chat() {
         sentiment: analysis.sentiment,
         severity: crisisCheck.severity,
         intent: analysis.intent,
-        isCrisis: false,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+      addChatMessage({
+        id: aiMessage.id,
+        text: aiMessage.text,
+        sender: "ai",
+        timestamp: new Date(),
+        emotion: analysis.emotion,
+        sentiment: analysis.sentiment,
+        severity: crisisCheck.severity,
+      });
 
-      // If moderate severity, add a follow-up wellness message
+      // Add wellness tip for moderate severity
       if (crisisCheck.severity === "moderate") {
+        await new Promise((resolve) => setTimeout(resolve, 800));
         const wellnessMsg: Message = {
           id: (Date.now() + 2).toString(),
           text: `💚 ${getWellnessSuggestion(analysis.emotion)}`,
@@ -145,19 +186,17 @@ export default function Chat() {
           timestamp: new Date(),
           emotion: analysis.emotion,
         };
-
-        setTimeout(() => {
-          setMessages((prev) => [...prev, wellnessMsg]);
-        }, 800);
+        setMessages((prev) => [...prev, wellnessMsg]);
       }
 
       setIsLoading(false);
     } catch (error) {
       console.error("Error processing message:", error);
+      setMessages((prev) => prev.filter((m) => m.id !== typingId));
 
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm having trouble processing your message right now. Please try again.",
+        text: "I'm having trouble processing your message right now, but I'm still here for you. Please try again.",
         sender: "ai",
         timestamp: new Date(),
       };
@@ -167,9 +206,26 @@ export default function Chat() {
     }
   };
 
+  const handleSuggestedPrompt = (prompt: string) => {
+    setInput(prompt);
+  };
+
+  const handleRetry = (messageId: string) => {
+    const messageIndex = messages.findIndex((m) => m.id === messageId);
+    if (messageIndex > 0) {
+      const userMessage = messages[messageIndex - 1];
+      if (userMessage.sender === "user") {
+        setInput(userMessage.text);
+        setMessages((prev) =>
+          prev.slice(0, messageIndex - 1)
+        );
+      }
+    }
+  };
+
   return (
     <Layout isAuthenticated={true} showNav={true}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         {/* Crisis Alert */}
         {crisisActive && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -195,54 +251,21 @@ export default function Chat() {
                   📞 AASRA: +91 9820466726
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Available 24/7 • Free & Confidential • No judgment
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  They are trained to help and want to listen to you.
+                  Available 24/7 • Free & Confidential
                 </p>
               </div>
 
               <div className="space-y-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="font-semibold text-foreground mb-3">
-                  Let's Ground You Now:
+                  Grounding Exercise (5-4-3-2-1):
                 </p>
                 <div className="space-y-2 text-sm text-muted-foreground">
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-blue-600 mt-0.5">5</span>
-                    <span>things you can see around you</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-blue-600 mt-0.5">4</span>
-                    <span>things you can touch</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-blue-600 mt-0.5">3</span>
-                    <span>things you can hear</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-blue-600 mt-0.5">2</span>
-                    <span>things you can smell</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-blue-600 mt-0.5">1</span>
-                    <span>thing you can taste</span>
-                  </p>
+                  <p>5 things you can <strong>see</strong></p>
+                  <p>4 things you can <strong>touch</strong></p>
+                  <p>3 things you can <strong>hear</strong></p>
+                  <p>2 things you can <strong>smell</strong></p>
+                  <p>1 thing you can <strong>taste</strong></p>
                 </div>
-                <p className="text-xs text-blue-600 mt-3 italic">
-                  This brings you back to the present moment. You're safe right
-                  now.
-                </p>
-              </div>
-
-              <div className="space-y-2 mb-6">
-                <p className="font-semibold text-foreground text-sm">
-                  Also Consider:
-                </p>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>💙 Call a trusted friend or family member</li>
-                  <li>🏥 Go to your nearest emergency room</li>
-                  <li>📱 Text "HELLO" to 741741 (Crisis Text Line)</li>
-                </ul>
               </div>
 
               <Button
@@ -256,17 +279,7 @@ export default function Chat() {
         )}
 
         {/* Chat Container */}
-        <div className="container mx-auto h-screen max-w-4xl flex flex-col px-4 py-4 sm:py-6">
-          {/* Header */}
-          <div className="mb-6 pb-4 border-b border-border">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Talk with MindCare
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Share your thoughts and feelings. I'm here to listen.
-            </p>
-          </div>
-
+        <div className="container mx-auto max-w-2xl flex-1 flex flex-col px-4 py-6">
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2">
             {messages.map((message) => (
@@ -274,57 +287,123 @@ export default function Chat() {
                 key={message.id}
                 className={`flex ${
                   message.sender === "user" ? "justify-end" : "justify-start"
-                }`}
+                } animate-fadeIn`}
               >
                 <div
-                  className={`max-w-xs sm:max-w-md lg:max-w-lg px-4 py-3 rounded-xl ${
+                  className={`max-w-lg px-5 py-4 rounded-2xl ${
                     message.sender === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-none"
-                      : "bg-card border border-border rounded-bl-none"
+                      ? "bg-primary text-primary-foreground rounded-br-none shadow-md"
+                      : message.isTyping
+                      ? "bg-card border border-border rounded-bl-none"
+                      : "bg-card border border-border rounded-bl-none shadow-subtle"
                   }`}
                 >
-                  <p className="text-sm sm:text-base">{message.text}</p>
-
-                  {/* Tags for AI messages */}
-                  {message.sender === "ai" && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {message.emotion && (
-                        <Badge
-                          className={`${
-                            emotionColors[message.emotion.toLowerCase()] ||
-                            emotionColors.neutral
-                          } cursor-default`}
-                          variant="secondary"
-                        >
-                          {message.emotion}
-                        </Badge>
-                      )}
-                      {message.sentiment && (
-                        <Badge
-                          className={`${
-                            sentimentColors[message.sentiment.toLowerCase()] ||
-                            sentimentColors.neutral
-                          } cursor-default`}
-                          variant="secondary"
-                        >
-                          {message.sentiment}
-                        </Badge>
-                      )}
-                      {message.severity && (
-                        <Badge
-                          className={`${
-                            severityColors[message.severity.toLowerCase()] ||
-                            severityColors.normal
-                          } cursor-default`}
-                          variant="secondary"
-                        >
-                          {message.severity}
-                        </Badge>
-                      )}
+                  {message.isTyping ? (
+                    <div className="flex gap-2 py-2">
+                      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce delay-100"></div>
+                      <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce delay-200"></div>
                     </div>
+                  ) : (
+                    <>
+                      <p className="text-sm leading-relaxed">{message.text}</p>
+
+                      {/* Emotion Tags */}
+                      {message.sender === "ai" && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {message.emotion && (
+                            <Badge
+                              className="bg-primary/10 text-primary cursor-default gap-1"
+                              variant="secondary"
+                            >
+                              <span>{emotionEmojis[message.emotion] || "😐"}</span>
+                              {message.emotion}
+                            </Badge>
+                          )}
+                          {message.sentiment && (
+                            <Badge
+                              className={`cursor-default ${
+                                message.sentiment === "positive"
+                                  ? "bg-green-100 text-green-700"
+                                  : message.sentiment === "negative"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}
+                              variant="secondary"
+                            >
+                              {message.sentiment}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Message Actions */}
+                      {message.sender === "ai" && !message.isTyping && (
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() =>
+                              handleCopyMessage(message.id, message.text)
+                            }
+                            className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            title="Copy message"
+                          >
+                            <Copy
+                              className={`h-4 w-4 ${
+                                copiedId === message.id
+                                  ? "text-green-600"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setFeedback((prev) => ({
+                                ...prev,
+                                [message.id]: "up",
+                              }))
+                            }
+                            className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            title="This was helpful"
+                          >
+                            <ThumbsUp
+                              className={`h-4 w-4 ${
+                                feedback[message.id] === "up"
+                                  ? "text-green-600 fill-green-600"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setFeedback((prev) => ({
+                                ...prev,
+                                [message.id]: "down",
+                              }))
+                            }
+                            className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            title="Not helpful"
+                          >
+                            <ThumbsDown
+                              className={`h-4 w-4 ${
+                                feedback[message.id] === "down"
+                                  ? "text-red-600 fill-red-600"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                          <button
+                            onClick={() => handleRetry(message.id)}
+                            className="p-2 hover:bg-muted rounded-lg transition-colors ml-auto"
+                            title="Regenerate response"
+                          >
+                            <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
 
-                  <p className="text-xs mt-2 opacity-70">
+                  <p className="text-xs mt-2 opacity-60">
                     {message.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -333,22 +412,32 @@ export default function Chat() {
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-card border border-border px-4 py-3 rounded-xl rounded-bl-none">
-                  <div className="flex gap-2">
-                    <div className="h-3 w-3 rounded-full bg-muted-foreground animate-pulse"></div>
-                    <div className="h-3 w-3 rounded-full bg-muted-foreground animate-pulse delay-100"></div>
-                    <div className="h-3 w-3 rounded-full bg-muted-foreground animate-pulse delay-200"></div>
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Wellness Tips - Dynamic based on recent messages */}
-          {!crisisActive && (
+          {/* Suggested Prompts - Show when no messages or at start */}
+          {messages.length <= 1 && !isLoading && (
+            <div className="mb-6">
+              <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
+                <Sparkles className="h-3 w-3" />
+                Suggestions
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {suggestedPrompts.map((prompt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSuggestedPrompt(prompt)}
+                    className="text-left p-3 rounded-lg bg-gradient-wellness border border-wellness-200 hover:border-wellness-400 hover:bg-wellness-100 transition-all text-sm text-foreground"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Wellness Reminder */}
+          {!crisisActive && messages.length > 3 && (
             <div className="mb-6 p-4 bg-wellness-50 border border-wellness-200 rounded-lg flex gap-3">
               <Lightbulb className="h-5 w-5 text-wellness-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
@@ -356,36 +445,63 @@ export default function Chat() {
                   💚 Wellness Reminder
                 </p>
                 <p className="text-wellness-600">
-                  {messages.length > 1 && messages[messages.length - 1].sender === "ai"
-                    ? messages[messages.length - 1].emotion
-                      ? getWellnessSuggestion(messages[messages.length - 1].emotion || "neutral")
-                      : "Remember to take care of yourself. You deserve compassion, especially from yourself."
-                    : "Taking care of your mental health is important. You're doing great by reaching out."}
+                  Remember to take breaks, stay hydrated, and be kind to
+                  yourself. You're doing great by seeking support.
                 </p>
               </div>
             </div>
           )}
 
           {/* Input Area */}
-          <form onSubmit={handleSendMessage} className="flex gap-3">
+          <form onSubmit={handleSendMessage} className="flex gap-3 mt-auto">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Share your thoughts..."
-              className="flex-1 h-11"
+              placeholder="Share what's on your mind..."
+              className="flex-1 h-11 rounded-full pl-6"
               disabled={isLoading || crisisActive}
             />
             <Button
               type="submit"
               disabled={isLoading || !input.trim() || crisisActive}
-              className="bg-primary hover:bg-wellness-600 text-primary-foreground gap-2 h-11 px-4 sm:px-6"
+              className="bg-primary hover:bg-wellness-600 text-primary-foreground gap-2 h-11 px-6 rounded-full"
             >
               <Send className="h-4 w-4" />
               <span className="hidden sm:inline">Send</span>
             </Button>
           </form>
+
+          {/* Status Indicator */}
+          {isLoading && (
+            <p className="text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-2">
+              <Brain className="h-3 w-3 animate-pulse" />
+              MindCare is thinking...
+            </p>
+          )}
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .delay-100 {
+          animation-delay: 100ms;
+        }
+        .delay-200 {
+          animation-delay: 200ms;
+        }
+      `}</style>
     </Layout>
   );
 }
