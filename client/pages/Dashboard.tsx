@@ -221,54 +221,43 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Emotion Distribution Chart - Improved Bar Chart */}
+          {/* Emotion Distribution Chart - CSS Based Bar Chart */}
           <div className="bg-card rounded-lg p-8 border border-border shadow-subtle mb-8">
             <h2 className="text-lg font-semibold text-foreground mb-6">
               Emotion Distribution (Last 7 Days)
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={emotionChartData}
-                margin={{ top: 20, right: 30, left: 0, bottom: 40 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="name"
-                  stroke="hsl(var(--muted-foreground))"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  style={{ fontSize: "12px" }}
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: "12px" }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    padding: "12px",
-                  }}
-                  formatter={(value, name, props) => [
-                    value,
-                    props.payload.fullName,
-                  ]}
-                  labelStyle={{ color: "hsl(var(--foreground))" }}
-                />
-                <Bar
-                  dataKey="value"
-                  fill="hsl(var(--primary))"
-                  radius={[8, 8, 0, 0]}
-                  barSize={40}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+
+            {/* Simple CSS Bar Chart */}
+            <div className="space-y-6">
+              {emotionChartData.map((emotion, i) => {
+                const maxValue = Math.max(...emotionChartData.map(e => e.value));
+                const percentage = (emotion.value / maxValue) * 100;
+                return (
+                  <div key={i} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground capitalize">
+                        {emotion.fullName}
+                      </span>
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+                        {emotion.value}
+                      </span>
+                    </div>
+                    <div className="h-8 bg-muted rounded-lg overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-accent rounded-lg transition-all hover:shadow-md-wellness flex items-center px-3"
+                        style={{ width: `${percentage}%` }}
+                      >
+                        {percentage > 20 && (
+                          <span className="text-xs font-semibold text-primary-foreground">
+                            {percentage.toFixed(0)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Wellness Tips */}
