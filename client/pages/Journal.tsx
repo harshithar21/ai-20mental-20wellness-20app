@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { X, Heart, Save, Flame, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAppContext } from "@/contexts/AppContext";
 
 interface JournalEntry {
   id: string;
