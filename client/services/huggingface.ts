@@ -391,11 +391,14 @@ function detectSentimentFallback(text: string): string {
 // Main analysis function
 export async function analyzeText(text: string): Promise<EmotionAnalysisResult> {
   try {
+    // Normalize text for better analysis (handles spelling mistakes)
+    const normalizedText = normalizeTextForAnalysis(text);
+
     // Determine severity first (keyword-based, most reliable)
     const severity = determineSeverity(text);
 
     // Detect intent (keyword-based)
-    const intent = detectIntent(text);
+    const intent = detectIntent(normalizedText);
 
     // Try to get emotion and sentiment from HuggingFace (with timeout)
     let emotion = "neutral";
@@ -405,8 +408,8 @@ export async function analyzeText(text: string): Promise<EmotionAnalysisResult> 
     if (HF_API_TOKEN) {
       try {
         const [emotionResult, sentimentResult] = await Promise.all([
-          getEmotionFromHF(text),
-          getSentimentFromHF(text),
+          getEmotionFromHF(normalizedText),
+          getSentimentFromHF(normalizedText),
         ]);
 
         emotion = emotionResult.emotion;
@@ -414,13 +417,13 @@ export async function analyzeText(text: string): Promise<EmotionAnalysisResult> 
         confidence = emotionResult.confidence;
       } catch (error) {
         console.warn("HuggingFace API failed, using fallback detection", error);
-        emotion = detectEmotionFallback(text);
-        sentiment = detectSentimentFallback(text);
+        emotion = detectEmotionFallback(normalizedText);
+        sentiment = detectSentimentFallback(normalizedText);
       }
     } else {
       // No token - use fallback detection
-      emotion = detectEmotionFallback(text);
-      sentiment = detectSentimentFallback(text);
+      emotion = detectEmotionFallback(normalizedText);
+      sentiment = detectSentimentFallback(normalizedText);
     }
 
     return {
