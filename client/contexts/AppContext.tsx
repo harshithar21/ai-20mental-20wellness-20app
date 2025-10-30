@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export interface MoodEntry {
   id: string;
@@ -64,58 +64,96 @@ interface AppContextType {
   getAverageMood: () => number;
   getCurrentStreak: () => number;
   getEmotionStats: () => Array<{ emotion: string; count: number }>;
+
+  // Loading state
+  isLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Default user profile
+const defaultUserProfile: UserProfile = {
+  name: "User",
+  email: "user@example.com",
+  avatar: "👤",
+  theme: "light",
+  notificationsEnabled: true,
+  privacyLevel: "private",
+};
+
+// Storage key
+const STORAGE_KEY = "mindcare_app_data";
+
+interface StoredData {
+  moodEntries: MoodEntry[];
+  journalEntries: JournalEntry[];
+  chatMessages: ChatMessage[];
+  userProfile: UserProfile;
+}
+
+function getStoredData(): StoredData {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Convert timestamp strings back to dates
+      if (parsed.chatMessages) {
+        parsed.chatMessages = parsed.chatMessages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+      }
+      return parsed;
+    }
+  } catch (error) {
+    console.error("Error loading stored data:", error);
+  }
+
+  // Return empty data structure if nothing stored
+  return {
+    moodEntries: [],
+    journalEntries: [],
+    chatMessages: [],
+    userProfile: defaultUserProfile,
+  };
+}
+
+function saveDataToStorage(data: StoredData) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error("Error saving data to localStorage:", error);
+  }
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Initialize with sample data
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([
-    { id: "m1", date: "Monday", mood: 6, emotion: "joy", sentiment: "positive", messageCount: 5 },
-    { id: "m2", date: "Tuesday", mood: 5, emotion: "anxiety", sentiment: "negative", messageCount: 3 },
-    { id: "m3", date: "Wednesday", mood: 7, emotion: "calm", sentiment: "positive", messageCount: 6 },
-    { id: "m4", date: "Thursday", mood: 5, emotion: "stress", sentiment: "negative", messageCount: 4 },
-    { id: "m5", date: "Friday", mood: 8, emotion: "joy", sentiment: "positive", messageCount: 8 },
-    { id: "m6", date: "Saturday", mood: 7, emotion: "love", sentiment: "positive", messageCount: 7 },
-    { id: "m7", date: "Sunday", mood: 6, emotion: "neutral", sentiment: "neutral", messageCount: 4 },
-  ]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
 
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([
-    {
-      id: "j1",
-      date: "Jan 15, 2024",
-      title: "Great day at work",
-      content: "Today was productive. I completed the project I was working on and got positive feedback from my team. Feeling accomplished and grateful.",
-      moodRating: 7,
-      moodTag: "Excellent",
-    },
-    {
-      id: "j2",
-      date: "Jan 14, 2024",
-      title: "Feeling anxious",
-      content: "Had a difficult conversation today. Feeling anxious about the outcome, but I'm trying to trust the process. Went for a walk which helped.",
-      moodRating: 4,
-      moodTag: "Okay",
-    },
-  ]);
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const stored = getStoredData();
+    setMoodEntries(stored.moodEntries);
+    setJournalEntries(stored.journalEntries);
+    setChatMessages(stored.chatMessages);
+    setUserProfile(stored.userProfile);
+    setIsLoading(false);
+  }, []);
 
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: "c1",
-      text: "Hello! I'm MindCare, your AI wellness companion. I'm here to listen and support you. What's on your mind today?",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
-
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    avatar: "👩‍🦰",
-    theme: "light",
-    notificationsEnabled: true,
-    privacyLevel: "private",
-  });
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    if (!isLoading) {
+      saveDataToStorage({
+        moodEntries,
+        journalEntries,
+        chatMessages,
+        userProfile,
+      });
+    }
+  }, [moodEntries, journalEntries, chatMessages, userProfile, isLoading]);
 
   const addMoodEntry = (entry: MoodEntry) => {
     setMoodEntries((prev) => [entry, ...prev]);
@@ -162,10 +200,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const getCurrentStreak = () => {
-    // Calculate streak from journal entries (consecutive days)
     if (journalEntries.length === 0) return 0;
-    // For now, return a fixed value; in production, calculate from actual dates
-    return Math.min(journalEntries.length, 7);
+    return Math.min(journalEntries.length, 365); // Max 365 days
   };
 
   const getEmotionStats = () => {
@@ -178,6 +214,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .map(([emotion, count]) => ({ emotion, count }))
       .sort((a, b) => b.count - a.count);
   };
+
+  // Don't render until data is loaded
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-4xl mb-4">💙</div>
+          <p className="text-muted-foreground">Loading MindCare...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AppContext.Provider
@@ -198,6 +246,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         getAverageMood,
         getCurrentStreak,
         getEmotionStats,
+        isLoading: false,
       }}
     >
       {children}
