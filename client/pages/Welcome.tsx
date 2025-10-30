@@ -1,6 +1,17 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain, Shield, Sparkles, TrendingUp, BookOpen, CheckCircle, MessageCircle, Heart, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Brain,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  BookOpen,
+  CheckCircle,
+  MessageCircle,
+  Heart,
+  Zap,
+} from "lucide-react";
 
 export default function Welcome() {
   const features = [
@@ -55,19 +66,22 @@ export default function Welcome() {
     {
       name: "Sarah M.",
       role: "User since 2024",
-      quote: "MindCare helped me understand my anxiety better. The daily tips are actionable and supportive.",
+      quote:
+        "MindCare helped me understand my anxiety better. The daily tips are actionable and supportive.",
       avatar: "👩‍🦰",
     },
     {
       name: "James K.",
       role: "Active user",
-      quote: "Finally found an app that feels like talking to a real person who cares. Highly recommend!",
+      quote:
+        "Finally found an app that feels like talking to a real person who cares. Highly recommend!",
       avatar: "👨",
     },
     {
       name: "Priya S.",
       role: "Daily journaler",
-      quote: "The journaling feature combined with mood tracking is powerful for self-discovery.",
+      quote:
+        "The journaling feature combined with mood tracking is powerful for self-discovery.",
       avatar: "👩",
     },
   ];
@@ -81,13 +95,18 @@ export default function Welcome() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-wellness-400 to-primary shadow-md">
               <span className="text-base font-bold text-white">💙</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">MindCare</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">
+              MindCare
+            </span>
           </div>
           <div className="flex gap-3">
             <Button variant="ghost" asChild className="font-semibold">
               <Link to="/login">Login</Link>
             </Button>
-            <Button asChild className="bg-primary hover:bg-wellness-600 font-semibold shadow-md hover:shadow-lg transition-all">
+            <Button
+              asChild
+              className="bg-primary hover:bg-wellness-600 font-semibold shadow-md hover:shadow-lg transition-all"
+            >
               <Link to="/signup">Sign Up</Link>
             </Button>
           </div>
@@ -109,7 +128,9 @@ export default function Welcome() {
                 Take Care of Your Mind
               </h1>
               <p className="text-xl sm:text-2xl text-muted-foreground max-w-lg leading-relaxed">
-                Get personalized emotional support, understand your feelings, and build a healthier mind with our advanced AI-powered wellness assistant.
+                Get personalized emotional support, understand your feelings,
+                and build a healthier mind with our advanced AI-powered wellness
+                assistant.
               </p>
             </div>
 
@@ -141,7 +162,9 @@ export default function Welcome() {
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-wellness-100">
                     <CheckCircle className="h-4 w-4 text-wellness-600" />
                   </div>
-                  <span className="text-muted-foreground font-medium">{benefit}</span>
+                  <span className="text-muted-foreground font-medium">
+                    {benefit}
+                  </span>
                 </div>
               ))}
             </div>
@@ -168,7 +191,9 @@ export default function Welcome() {
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{item.emoji}</span>
-                      <span className="font-semibold text-foreground">{item.label}</span>
+                      <span className="font-semibold text-foreground">
+                        {item.label}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -186,7 +211,8 @@ export default function Welcome() {
               Everything You Need for Mental Wellness
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive features designed to support your emotional journey every step of the way
+              Comprehensive features designed to support your emotional journey
+              every step of the way
             </p>
           </div>
 
@@ -204,7 +230,9 @@ export default function Welcome() {
                   <h3 className="mb-3 text-lg font-semibold text-foreground">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               );
             })}
@@ -255,11 +283,15 @@ export default function Welcome() {
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary mx-auto border-4 border-primary/20">
                   {item.icon}
                 </div>
-                <span className="inline-block bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold mb-4">Step {item.step}</span>
+                <span className="inline-block bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold mb-4">
+                  Step {item.step}
+                </span>
                 <h3 className="mb-3 text-xl font-semibold text-foreground">
                   {item.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
               </div>
             </div>
           ))}
@@ -287,8 +319,12 @@ export default function Welcome() {
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-4xl">{testimonial.avatar}</span>
                   <div>
-                    <p className="font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    <p className="font-semibold text-foreground">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {testimonial.role}
+                    </p>
                   </div>
                 </div>
                 <p className="text-muted-foreground italic leading-relaxed mb-4">
@@ -296,7 +332,9 @@ export default function Welcome() {
                 </p>
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, j) => (
-                    <span key={j} className="text-lg">⭐</span>
+                    <span key={j} className="text-lg">
+                      ⭐
+                    </span>
                   ))}
                 </div>
               </div>
@@ -312,7 +350,8 @@ export default function Welcome() {
             Start Your Wellness Journey Today
           </h2>
           <p className="mb-8 text-lg opacity-90 max-w-2xl mx-auto">
-            Join thousands who are taking control of their mental health with MindCare. Your first step toward a healthier mind starts now.
+            Join thousands who are taking control of their mental health with
+            MindCare. Your first step toward a healthier mind starts now.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -346,10 +385,18 @@ export default function Welcome() {
             🆘 In crisis? AASRA Helpline: +91 9820466726 (24/7)
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-xs">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-foreground transition-colors">Contact Us</a>
-            <a href="#" className="hover:text-foreground transition-colors">Blog</a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Terms of Service
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Contact Us
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Blog
+            </a>
           </div>
         </div>
       </footer>

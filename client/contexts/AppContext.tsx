@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 export interface MoodEntry {
   id: string;
@@ -131,7 +137,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
+  const [userProfile, setUserProfile] =
+    useState<UserProfile>(defaultUserProfile);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -161,7 +168,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateMoodEntry = (id: string, updates: Partial<MoodEntry>) => {
     setMoodEntries((prev) =>
-      prev.map((entry) => (entry.id === id ? { ...entry, ...updates } : entry))
+      prev.map((entry) => (entry.id === id ? { ...entry, ...updates } : entry)),
     );
   };
 
@@ -175,7 +182,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateJournalEntry = (id: string, updates: Partial<JournalEntry>) => {
     setJournalEntries((prev) =>
-      prev.map((entry) => (entry.id === id ? { ...entry, ...updates } : entry))
+      prev.map((entry) => (entry.id === id ? { ...entry, ...updates } : entry)),
     );
   };
 

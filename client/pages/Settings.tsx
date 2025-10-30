@@ -27,7 +27,14 @@ import {
 import { useAppContext } from "@/contexts/AppContext";
 
 export default function Settings() {
-  const { userProfile, updateUserProfile, clearChatHistory, journalEntries, chatMessages, moodEntries } = useAppContext();
+  const {
+    userProfile,
+    updateUserProfile,
+    clearChatHistory,
+    journalEntries,
+    chatMessages,
+    moodEntries,
+  } = useAppContext();
 
   // Profile State
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -35,7 +42,9 @@ export default function Settings() {
   const [editedEmail, setEditedEmail] = useState(userProfile.email);
   const [profileSaved, setProfileSaved] = useState(false);
   const [editAvatarOpen, setEditAvatarOpen] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(userProfile.avatar || "👤");
+  const [selectedAvatar, setSelectedAvatar] = useState(
+    userProfile.avatar || "👤",
+  );
 
   const avatarOptions = ["👤", "��", "👩", "👨‍🦱", "👩‍🦱", "🧑", "😊", "🙂"];
 
@@ -119,7 +128,7 @@ export default function Settings() {
       // Create JSON string with pretty formatting
       const jsonString = JSON.stringify(userData, null, 2);
       const blob = new Blob([jsonString], { type: "application/json" });
-      
+
       // Create download link
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -173,7 +182,7 @@ export default function Settings() {
     setDeleteLoading(true);
     try {
       // In production, this would call a secure API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       alert("🗑️ Account deletion initiated. Redirecting to homepage...");
       setShowDeleteConfirm(false);
       setDeleteLoading(false);
@@ -207,12 +216,16 @@ export default function Settings() {
           <Card className="mb-8 p-8 bg-gradient-to-br from-card to-card/50 border-border/50 shadow-sm">
             <div className="flex items-start justify-between mb-8">
               <div className="flex items-center gap-6">
-                <div className="text-7xl p-4 bg-primary/10 rounded-2xl">{selectedAvatar}</div>
+                <div className="text-7xl p-4 bg-primary/10 rounded-2xl">
+                  {selectedAvatar}
+                </div>
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-1">
                     {userProfile.name}
                   </h2>
-                  <p className="text-muted-foreground mb-3">{userProfile.email}</p>
+                  <p className="text-muted-foreground mb-3">
+                    {userProfile.email}
+                  </p>
                   <Badge className="bg-primary/20 text-primary border-primary/30">
                     ✨ Active Member
                   </Badge>
@@ -226,7 +239,11 @@ export default function Settings() {
                     : "bg-primary hover:bg-wellness-600"
                 }`}
               >
-                {isEditingProfile ? <X className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                {isEditingProfile ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <User className="h-4 w-4" />
+                )}
                 {isEditingProfile ? "Cancel" : "Edit Profile"}
               </Button>
             </div>
@@ -306,7 +323,9 @@ export default function Settings() {
                 <div className="p-3 bg-yellow-100 rounded-lg">
                   <Bell className="h-5 w-5 text-yellow-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">Notifications</h3>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Notifications
+                </h3>
               </div>
 
               <div className="space-y-3">
@@ -343,14 +362,20 @@ export default function Settings() {
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{notif.icon}</span>
                       <div>
-                        <p className="font-medium text-foreground">{notif.title}</p>
-                        <p className="text-xs text-muted-foreground">{notif.desc}</p>
+                        <p className="font-medium text-foreground">
+                          {notif.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {notif.desc}
+                        </p>
                       </div>
                     </div>
                     <button
                       onClick={() => handleNotificationToggle(notif.key)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        notifications[notif.key] ? "bg-primary" : "bg-muted border border-border"
+                        notifications[notif.key]
+                          ? "bg-primary"
+                          : "bg-muted border border-border"
                       }`}
                     >
                       <span
@@ -372,11 +397,15 @@ export default function Settings() {
                 <div className="p-3 bg-purple-100 rounded-lg">
                   <Moon className="h-5 w-5 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">Appearance</h3>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Appearance
+                </h3>
               </div>
 
               <div className="space-y-4">
-                <div className="text-sm font-semibold text-foreground mb-4">Theme</div>
+                <div className="text-sm font-semibold text-foreground mb-4">
+                  Theme
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { value: "light" as const, label: "Light Mode", icon: Sun },
@@ -412,13 +441,17 @@ export default function Settings() {
               <div className="p-3 bg-green-100 rounded-lg">
                 <Shield className="h-5 w-5 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Privacy & Security</h3>
+              <h3 className="text-lg font-semibold text-foreground">
+                Privacy & Security
+              </h3>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Privacy Level */}
               <div>
-                <p className="text-sm font-semibold text-foreground mb-4">Profile Visibility</p>
+                <p className="text-sm font-semibold text-foreground mb-4">
+                  Profile Visibility
+                </p>
                 <div className="space-y-2">
                   {[
                     {
@@ -466,7 +499,9 @@ export default function Settings() {
 
               {/* Security Options */}
               <div>
-                <p className="text-sm font-semibold text-foreground mb-4">Account Security</p>
+                <p className="text-sm font-semibold text-foreground mb-4">
+                  Account Security
+                </p>
                 <div className="space-y-2">
                   <Button
                     onClick={() => setShowPasswordChange(true)}
@@ -497,15 +532,21 @@ export default function Settings() {
                 <FileJson className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-foreground">Data Management</h3>
-                <p className="text-xs text-muted-foreground">Total data: ~{totalDataSize} KB</p>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Data Management
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Total data: ~{totalDataSize} KB
+                </p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between p-5 bg-muted/40 rounded-xl hover:bg-muted/60 transition-colors">
                 <div>
-                  <p className="font-semibold text-foreground">Download Your Data</p>
+                  <p className="font-semibold text-foreground">
+                    Download Your Data
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Get a JSON copy of all your personal data
                   </p>
@@ -531,7 +572,9 @@ export default function Settings() {
 
               <div className="flex items-center justify-between p-5 bg-muted/40 rounded-xl hover:bg-muted/60 transition-colors">
                 <div>
-                  <p className="font-semibold text-foreground">Clear Chat History</p>
+                  <p className="font-semibold text-foreground">
+                    Clear Chat History
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Permanently delete all conversations
                   </p>
@@ -677,7 +720,8 @@ export default function Settings() {
                     Clear Chat History?
                   </h2>
                   <p className="text-sm text-muted-foreground mt-2">
-                    This will permanently delete all your conversations. This action cannot be undone.
+                    This will permanently delete all your conversations. This
+                    action cannot be undone.
                   </p>
                 </div>
               </div>
@@ -713,7 +757,8 @@ export default function Settings() {
                     Delete Account?
                   </h2>
                   <p className="text-sm text-muted-foreground mt-2">
-                    This will permanently delete your account and all associated data. This action cannot be undone.
+                    This will permanently delete your account and all associated
+                    data. This action cannot be undone.
                   </p>
                 </div>
               </div>
@@ -748,9 +793,12 @@ export default function Settings() {
         {showLogoutConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
             <Card className="max-w-md w-full p-8">
-              <h2 className="text-xl font-bold text-foreground mb-3">Sign Out?</h2>
+              <h2 className="text-xl font-bold text-foreground mb-3">
+                Sign Out?
+              </h2>
               <p className="text-muted-foreground mb-8">
-                You will be logged out and will need to sign in again to access your account.
+                You will be logged out and will need to sign in again to access
+                your account.
               </p>
               <div className="flex gap-3">
                 <Button

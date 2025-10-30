@@ -6,45 +6,45 @@ const HF_API_TOKEN = import.meta.env.VITE_HF_API_TOKEN || "";
 
 // Common spelling corrections for smart understanding
 const COMMON_MISSPELLINGS: Record<string, string> = {
-  "helo": "hello",
-  "hi": "hi",
-  "hey": "hey",
-  "gud": "good",
-  "gud": "good",
-  "ok": "okay",
-  "okk": "okay",
-  "thnx": "thanks",
-  "thanx": "thanks",
-  "thx": "thanks",
-  "ya": "yes",
-  "ya": "yes",
-  "nope": "no",
-  "nah": "no",
-  "u": "you",
-  "ur": "your",
-  "ur": "your",
-  "wanna": "want to",
-  "gonna": "going to",
-  "gotta": "got to",
-  "kinda": "kind of",
-  "dunno": "don't know",
-  "dnt": "don't",
-  "dont": "don't",
-  "cant": "can't",
-  "wont": "won't",
-  "shouldnt": "shouldn't",
-  "im": "i'm",
-  "im": "i'm",
-  "ive": "i've",
-  "shes": "she's",
-  "hes": "he's",
-  "theyre": "they're",
-  "thats": "that's",
-  "whats": "what's",
-  "whos": "who's",
-  "wheres": "where's",
-  "hows": "how's",
-  "lets": "let's",
+  helo: "hello",
+  hi: "hi",
+  hey: "hey",
+  gud: "good",
+  gud: "good",
+  ok: "okay",
+  okk: "okay",
+  thnx: "thanks",
+  thanx: "thanks",
+  thx: "thanks",
+  ya: "yes",
+  ya: "yes",
+  nope: "no",
+  nah: "no",
+  u: "you",
+  ur: "your",
+  ur: "your",
+  wanna: "want to",
+  gonna: "going to",
+  gotta: "got to",
+  kinda: "kind of",
+  dunno: "don't know",
+  dnt: "don't",
+  dont: "don't",
+  cant: "can't",
+  wont: "won't",
+  shouldnt: "shouldn't",
+  im: "i'm",
+  im: "i'm",
+  ive: "i've",
+  shes: "she's",
+  hes: "he's",
+  theyre: "they're",
+  thats: "that's",
+  whats: "what's",
+  whos: "who's",
+  wheres: "where's",
+  hows: "how's",
+  lets: "let's",
 };
 
 // Smart text correction - understands common misspellings without correcting user input
@@ -164,13 +164,19 @@ function determineSeverity(text: string): "normal" | "moderate" | "crisis" {
 function detectIntent(text: string): string {
   const lowerText = text.toLowerCase();
 
-  if (INTENT_PATTERNS.ask_advice.some((pattern) => lowerText.includes(pattern))) {
+  if (
+    INTENT_PATTERNS.ask_advice.some((pattern) => lowerText.includes(pattern))
+  ) {
     return "ask_advice";
   }
   if (INTENT_PATTERNS.venting.some((pattern) => lowerText.includes(pattern))) {
     return "venting";
   }
-  if (INTENT_PATTERNS.seeking_support.some((pattern) => lowerText.includes(pattern))) {
+  if (
+    INTENT_PATTERNS.seeking_support.some((pattern) =>
+      lowerText.includes(pattern),
+    )
+  ) {
     return "seeking_support";
   }
 
@@ -217,7 +223,9 @@ function mapEmotionLabel(label: string): string {
 }
 
 // Call HuggingFace Emotion API
-async function getEmotionFromHF(text: string): Promise<{ emotion: string; confidence: number }> {
+async function getEmotionFromHF(
+  text: string,
+): Promise<{ emotion: string; confidence: number }> {
   try {
     if (!HF_API_TOKEN) {
       console.warn("HF_API_TOKEN not set, using fallback emotion detection");
@@ -229,8 +237,11 @@ async function getEmotionFromHF(text: string): Promise<{ emotion: string; confid
       {
         headers: { Authorization: `Bearer ${HF_API_TOKEN}` },
         method: "POST",
-        body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
-      }
+        body: JSON.stringify({
+          inputs: text,
+          options: { wait_for_model: true },
+        }),
+      },
     );
 
     if (!response.ok) {
@@ -272,8 +283,11 @@ async function getSentimentFromHF(text: string): Promise<string> {
       {
         headers: { Authorization: `Bearer ${HF_API_TOKEN}` },
         method: "POST",
-        body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
-      }
+        body: JSON.stringify({
+          inputs: text,
+          options: { wait_for_model: true },
+        }),
+      },
     );
 
     if (!response.ok) {
@@ -377,10 +391,10 @@ function detectSentimentFallback(text: string): string {
   ];
 
   const positiveCount = positiveWords.filter((word) =>
-    lowerText.includes(word)
+    lowerText.includes(word),
   ).length;
   const negativeCount = negativeWords.filter((word) =>
-    lowerText.includes(word)
+    lowerText.includes(word),
   ).length;
 
   if (positiveCount > negativeCount) return "positive";
@@ -389,7 +403,9 @@ function detectSentimentFallback(text: string): string {
 }
 
 // Main analysis function
-export async function analyzeText(text: string): Promise<EmotionAnalysisResult> {
+export async function analyzeText(
+  text: string,
+): Promise<EmotionAnalysisResult> {
   try {
     // Normalize text for better analysis (handles spelling mistakes)
     const normalizedText = normalizeTextForAnalysis(text);

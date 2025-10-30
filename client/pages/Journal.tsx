@@ -4,7 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { X, Heart, Save, Flame, Calendar, Trash2, Edit2, ChevronRight } from "lucide-react";
+import {
+  X,
+  Heart,
+  Save,
+  Flame,
+  Calendar,
+  Trash2,
+  Edit2,
+  ChevronRight,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAppContext } from "@/contexts/AppContext";
 
@@ -31,13 +40,41 @@ const reflectionPrompts = [
 ];
 
 const moodOptions = [
-  { value: 1, label: "😢 Terrible", color: "bg-red-100 text-red-800 border-red-300" },
-  { value: 2, label: "😟 Poor", color: "bg-orange-100 text-orange-800 border-orange-300" },
-  { value: 3, label: "😕 Bad", color: "bg-amber-100 text-amber-800 border-amber-300" },
-  { value: 4, label: "😐 Okay", color: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  { value: 5, label: "🙂 Good", color: "bg-lime-100 text-lime-800 border-lime-300" },
-  { value: 6, label: "😊 Great", color: "bg-wellness-100 text-wellness-800 border-wellness-300" },
-  { value: 7, label: "😄 Excellent", color: "bg-green-100 text-green-800 border-green-300" },
+  {
+    value: 1,
+    label: "😢 Terrible",
+    color: "bg-red-100 text-red-800 border-red-300",
+  },
+  {
+    value: 2,
+    label: "😟 Poor",
+    color: "bg-orange-100 text-orange-800 border-orange-300",
+  },
+  {
+    value: 3,
+    label: "😕 Bad",
+    color: "bg-amber-100 text-amber-800 border-amber-300",
+  },
+  {
+    value: 4,
+    label: "😐 Okay",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-300",
+  },
+  {
+    value: 5,
+    label: "🙂 Good",
+    color: "bg-lime-100 text-lime-800 border-lime-300",
+  },
+  {
+    value: 6,
+    label: "😊 Great",
+    color: "bg-wellness-100 text-wellness-800 border-wellness-300",
+  },
+  {
+    value: 7,
+    label: "😄 Excellent",
+    color: "bg-green-100 text-green-800 border-green-300",
+  },
 ];
 
 export default function Journal() {
@@ -57,9 +94,14 @@ export default function Journal() {
 
   const streak = getCurrentStreak();
   const totalEntries = journalEntries.length;
-  const averageMood = journalEntries.length > 0
-    ? Math.round((journalEntries.reduce((sum, e) => sum + e.moodRating, 0) / journalEntries.length) * 10) / 10
-    : 0;
+  const averageMood =
+    journalEntries.length > 0
+      ? Math.round(
+          (journalEntries.reduce((sum, e) => sum + e.moodRating, 0) /
+            journalEntries.length) *
+            10,
+        ) / 10
+      : 0;
 
   const handleAddEntry = () => {
     if (title.trim() || content.trim()) {
@@ -93,7 +135,11 @@ export default function Journal() {
   };
 
   const handleDeleteEntry = (id: string) => {
-    if (confirm("Are you sure you want to delete this entry? This action cannot be undone.")) {
+    if (
+      confirm(
+        "Are you sure you want to delete this entry? This action cannot be undone.",
+      )
+    ) {
       deleteJournalEntry(id);
       alert("Entry deleted.");
     }
@@ -153,9 +199,7 @@ export default function Journal() {
                   <p className="text-sm text-muted-foreground font-semibold mb-2">
                     Current Streak
                   </p>
-                  <p className="text-4xl font-bold text-accent">
-                    {streak}
-                  </p>
+                  <p className="text-4xl font-bold text-accent">{streak}</p>
                   <p className="text-xs text-muted-foreground">days active</p>
                 </div>
                 <div className="p-3 bg-accent/10 rounded-lg">
@@ -313,7 +357,8 @@ export default function Journal() {
                   No entries yet. Start journaling to build your wellness habit!
                 </p>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Journaling helps you process emotions, track patterns, and celebrate growth.
+                  Journaling helps you process emotions, track patterns, and
+                  celebrate growth.
                 </p>
               </Card>
             ) : (
@@ -412,10 +457,15 @@ export default function Journal() {
                   desc: "Don't just write. Draw, use prompts, or write poetry. Make it enjoyable.",
                 },
               ].map((tip, i) => (
-                <div key={i} className="flex gap-4 p-4 bg-white/50 rounded-lg border border-wellness-200/50">
+                <div
+                  key={i}
+                  className="flex gap-4 p-4 bg-white/50 rounded-lg border border-wellness-200/50"
+                >
                   <div className="text-3xl flex-shrink-0">{tip.emoji}</div>
                   <div>
-                    <p className="font-semibold text-foreground mb-1">{tip.title}</p>
+                    <p className="font-semibold text-foreground mb-1">
+                      {tip.title}
+                    </p>
                     <p className="text-sm text-muted-foreground">{tip.desc}</p>
                   </div>
                 </div>

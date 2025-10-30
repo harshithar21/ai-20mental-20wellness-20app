@@ -129,12 +129,16 @@ export function getSupportiveResponse(context: ResponseContext): string {
   }
 
   // Get emotion-based response
-  const emotionOptions = emotionResponses[emotion] || emotionResponses["neutral"];
-  const emotionResponse = emotionOptions[Math.floor(Math.random() * emotionOptions.length)];
+  const emotionOptions =
+    emotionResponses[emotion] || emotionResponses["neutral"];
+  const emotionResponse =
+    emotionOptions[Math.floor(Math.random() * emotionOptions.length)];
 
   // Get intent-based response
-  const intentOptions = intentResponses[intent] || intentResponses["general_conversation"];
-  const intentResponse = intentOptions[Math.floor(Math.random() * intentOptions.length)];
+  const intentOptions =
+    intentResponses[intent] || intentResponses["general_conversation"];
+  const intentResponse =
+    intentOptions[Math.floor(Math.random() * intentOptions.length)];
 
   // Combine responses intelligently
   const combinedResponse = `${emotionResponse}\n\n${intentResponse}`;

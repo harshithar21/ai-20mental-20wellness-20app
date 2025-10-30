@@ -63,10 +63,22 @@ const suggestedPrompts = [
 ];
 
 const quickActions = [
-  { icon: "😌", label: "Meditation Tips", query: "Can you give me meditation tips?" },
-  { icon: "🎯", label: "Goal Setting", query: "Help me set realistic wellness goals" },
+  {
+    icon: "😌",
+    label: "Meditation Tips",
+    query: "Can you give me meditation tips?",
+  },
+  {
+    icon: "🎯",
+    label: "Goal Setting",
+    query: "Help me set realistic wellness goals",
+  },
   { icon: "🌙", label: "Sleep Help", query: "I'm having trouble sleeping" },
-  { icon: "💪", label: "Motivation", query: "I need motivation and encouragement" },
+  {
+    icon: "💪",
+    label: "Motivation",
+    query: "I need motivation and encouragement",
+  },
 ];
 
 export default function Chat() {
@@ -186,7 +198,10 @@ export default function Chat() {
       });
 
       // Add follow-up wellness message based on intent and emotion
-      if (crisisCheck.severity === "moderate" || analysis.intent === "seeking_support") {
+      if (
+        crisisCheck.severity === "moderate" ||
+        analysis.intent === "seeking_support"
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 600));
         const wellnessMsg: Message = {
           id: (Date.now() + 2).toString(),
@@ -229,14 +244,14 @@ export default function Chat() {
       const userMessage = messages[messageIndex - 1];
       if (userMessage.sender === "user") {
         setInput(userMessage.text);
-        setMessages((prev) =>
-          prev.slice(0, messageIndex - 1)
-        );
+        setMessages((prev) => prev.slice(0, messageIndex - 1));
       }
     }
   };
 
-  const lastUserMessage = [...messages].reverse().find(m => m.sender === "user");
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.sender === "user");
 
   return (
     <Layout isAuthenticated={true} showNav={true}>
@@ -253,7 +268,10 @@ export default function Chat() {
               </div>
 
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                I hear that you're going through something very difficult right now. Your life has real value, and there are people who want to help you. Please reach out to one of these resources immediately.
+                I hear that you're going through something very difficult right
+                now. Your life has real value, and there are people who want to
+                help you. Please reach out to one of these resources
+                immediately.
               </p>
 
               <div className="space-y-3 mb-6 p-5 bg-red-50 rounded-xl border border-red-200">
@@ -262,11 +280,17 @@ export default function Chat() {
                 </p>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-muted-foreground">AASRA (India)</p>
-                    <p className="text-xl font-bold text-red-600">+91 9820466726</p>
+                    <p className="text-xs text-muted-foreground">
+                      AASRA (India)
+                    </p>
+                    <p className="text-xl font-bold text-red-600">
+                      +91 9820466726
+                    </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">iCall (India)</p>
+                    <p className="text-xs text-muted-foreground">
+                      iCall (India)
+                    </p>
                     <p className="text-xl font-bold text-red-600">9152987821</p>
                   </div>
                 </div>
@@ -280,11 +304,21 @@ export default function Chat() {
                   📍 Grounding Exercise (5-4-3-2-1)
                 </p>
                 <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>🔍 5 things you can <strong>see</strong></p>
-                  <p>✋ 4 things you can <strong>touch</strong></p>
-                  <p>👂 3 things you can <strong>hear</strong></p>
-                  <p>👃 2 things you can <strong>smell</strong></p>
-                  <p>👅 1 thing you can <strong>taste</strong></p>
+                  <p>
+                    🔍 5 things you can <strong>see</strong>
+                  </p>
+                  <p>
+                    ✋ 4 things you can <strong>touch</strong>
+                  </p>
+                  <p>
+                    👂 3 things you can <strong>hear</strong>
+                  </p>
+                  <p>
+                    👃 2 things you can <strong>smell</strong>
+                  </p>
+                  <p>
+                    👅 1 thing you can <strong>taste</strong>
+                  </p>
                 </div>
               </div>
 
@@ -314,19 +348,27 @@ export default function Chat() {
                     message.sender === "user"
                       ? "bg-primary text-primary-foreground rounded-br-none shadow-md hover:shadow-lg transition-shadow"
                       : message.isTyping
-                      ? "bg-card border border-border rounded-bl-none"
-                      : "bg-card border border-border rounded-bl-none shadow-sm hover:shadow-md transition-shadow"
+                        ? "bg-card border border-border rounded-bl-none"
+                        : "bg-card border border-border rounded-bl-none shadow-sm hover:shadow-md transition-shadow"
                   }`}
                 >
                   {message.isTyping ? (
                     <div className="flex gap-2 py-2">
                       <div className="h-3 w-3 rounded-full bg-muted-foreground animate-bounce"></div>
-                      <div className="h-3 w-3 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="h-3 w-3 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      <div
+                        className="h-3 w-3 rounded-full bg-muted-foreground animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="h-3 w-3 rounded-full bg-muted-foreground animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                        {message.text}
+                      </p>
 
                       {/* Emotion Tags */}
                       {message.sender === "ai" && !message.isTyping && (
@@ -336,8 +378,12 @@ export default function Chat() {
                               className="bg-primary/15 text-primary cursor-default gap-1 border-primary/30"
                               variant="secondary"
                             >
-                              <span>{emotionEmojis[message.emotion] || "😐"}</span>
-                              <span className="capitalize">{message.emotion}</span>
+                              <span>
+                                {emotionEmojis[message.emotion] || "😐"}
+                              </span>
+                              <span className="capitalize">
+                                {message.emotion}
+                              </span>
                             </Badge>
                           )}
                           {message.sentiment && (
@@ -346,8 +392,8 @@ export default function Chat() {
                                 message.sentiment === "positive"
                                   ? "bg-green-100 text-green-700 border-green-300"
                                   : message.sentiment === "negative"
-                                  ? "bg-red-100 text-red-700 border-red-300"
-                                  : "bg-gray-100 text-gray-700 border-gray-300"
+                                    ? "bg-red-100 text-red-700 border-red-300"
+                                    : "bg-gray-100 text-gray-700 border-gray-300"
                               }`}
                               variant="secondary"
                             >
@@ -482,9 +528,12 @@ export default function Chat() {
             <div className="mb-6 p-4 bg-gradient-to-r from-wellness-50 to-primary/5 border border-wellness-200 rounded-xl flex gap-3 animate-fadeIn">
               <Lightbulb className="h-5 w-5 text-wellness-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-semibold text-wellness-700 mb-1">💚 Wellness Reminder</p>
+                <p className="font-semibold text-wellness-700 mb-1">
+                  💚 Wellness Reminder
+                </p>
                 <p className="text-wellness-600 text-xs">
-                  You're doing great by exploring your feelings. Remember: small steps lead to big changes. Be patient and kind to yourself.
+                  You're doing great by exploring your feelings. Remember: small
+                  steps lead to big changes. Be patient and kind to yourself.
                 </p>
               </div>
             </div>

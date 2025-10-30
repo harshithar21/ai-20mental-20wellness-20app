@@ -3,7 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,7 +23,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +45,7 @@ export default function Login() {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       setSuccess("✅ Login successful! Redirecting...");
       setTimeout(() => {
         navigate("/chat");
@@ -67,7 +77,9 @@ export default function Login() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-wellness-600 shadow-md">
             <span className="text-lg font-bold text-white">💙</span>
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">MindCare</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">
+            MindCare
+          </span>
         </Link>
 
         {/* Card */}
@@ -139,7 +151,9 @@ export default function Login() {
               <div className="w-full border-t border-border/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-card px-3 text-muted-foreground font-medium">Or continue with email</span>
+              <span className="bg-card px-3 text-muted-foreground font-medium">
+                Or continue with email
+              </span>
             </div>
           </div>
 
@@ -166,7 +180,10 @@ export default function Login() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-foreground font-semibold">
+                <Label
+                  htmlFor="password"
+                  className="text-foreground font-semibold"
+                >
                   Password
                 </Label>
                 <Link
@@ -223,7 +240,9 @@ export default function Login() {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">Don't have an account? </span>
+            <span className="text-muted-foreground">
+              Don't have an account?{" "}
+            </span>
             <Link
               to="/signup"
               className="text-primary hover:text-wellness-600 font-semibold transition-colors"
@@ -237,9 +256,13 @@ export default function Login() {
         <p className="text-center text-xs text-muted-foreground mt-8 leading-relaxed">
           By signing in, you agree to our
           <br />
-          <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-foreground transition-colors">
+            Terms of Service
+          </a>
           {" and "}
-          <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-foreground transition-colors">
+            Privacy Policy
+          </a>
         </p>
       </div>
     </div>

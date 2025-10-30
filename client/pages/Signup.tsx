@@ -3,7 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -28,7 +38,8 @@ export default function Signup() {
   const passwordsMatch = password === confirmPassword && password.length > 0;
   const isFormValid = name && email && allRequirementsMet && passwordsMatch;
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +70,7 @@ export default function Signup() {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       setSuccess("✅ Account created successfully! Redirecting...");
       setTimeout(() => {
         navigate("/chat");
@@ -91,7 +102,9 @@ export default function Signup() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-wellness-600 shadow-md">
             <span className="text-lg font-bold text-white">💙</span>
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">MindCare</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">
+            MindCare
+          </span>
         </Link>
 
         {/* Card */}
@@ -163,7 +176,9 @@ export default function Signup() {
               <div className="w-full border-t border-border/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-card px-3 text-muted-foreground font-medium">Or register with email</span>
+              <span className="bg-card px-3 text-muted-foreground font-medium">
+                Or register with email
+              </span>
             </div>
           </div>
 
@@ -208,7 +223,10 @@ export default function Signup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground font-semibold">
+              <Label
+                htmlFor="password"
+                className="text-foreground font-semibold"
+              >
                 Password
               </Label>
               <div className="relative">
@@ -243,14 +261,22 @@ export default function Signup() {
                     key={i}
                     className="flex items-center gap-2 text-xs transition-colors"
                   >
-                    <div className={`h-4 w-4 rounded-full flex items-center justify-center ${
-                      req.met ? "bg-green-100" : "bg-muted"
-                    }`}>
+                    <div
+                      className={`h-4 w-4 rounded-full flex items-center justify-center ${
+                        req.met ? "bg-green-100" : "bg-muted"
+                      }`}
+                    >
                       {req.met && (
                         <CheckCircle className="h-3 w-3 text-green-600" />
                       )}
                     </div>
-                    <span className={req.met ? "text-green-700 font-medium" : "text-muted-foreground"}>
+                    <span
+                      className={
+                        req.met
+                          ? "text-green-700 font-medium"
+                          : "text-muted-foreground"
+                      }
+                    >
                       {req.text}
                     </span>
                   </div>
@@ -259,7 +285,10 @@ export default function Signup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground font-semibold">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-foreground font-semibold"
+              >
                 Confirm Password
               </Label>
               <div className="relative">
@@ -321,7 +350,9 @@ export default function Signup() {
 
           {/* Sign In Link */}
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
+            <span className="text-muted-foreground">
+              Already have an account?{" "}
+            </span>
             <Link
               to="/login"
               className="text-primary hover:text-wellness-600 font-semibold transition-colors"
@@ -335,9 +366,13 @@ export default function Signup() {
         <p className="text-center text-xs text-muted-foreground mt-8 leading-relaxed">
           By creating an account, you agree to our
           <br />
-          <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-foreground transition-colors">
+            Terms of Service
+          </a>
           {" and "}
-          <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-foreground transition-colors">
+            Privacy Policy
+          </a>
         </p>
       </div>
     </div>
