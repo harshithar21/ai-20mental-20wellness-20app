@@ -1,7 +1,64 @@
 // HuggingFace API service for emotion and sentiment analysis
 // Uses advanced models: GoEmotions and Twitter RoBERTa sentiment
+// Includes spell-checking and text normalization
 
 const HF_API_TOKEN = import.meta.env.VITE_HF_API_TOKEN || "";
+
+// Common spelling corrections for smart understanding
+const COMMON_MISSPELLINGS: Record<string, string> = {
+  "helo": "hello",
+  "hi": "hi",
+  "hey": "hey",
+  "gud": "good",
+  "gud": "good",
+  "ok": "okay",
+  "okk": "okay",
+  "thnx": "thanks",
+  "thanx": "thanks",
+  "thx": "thanks",
+  "ya": "yes",
+  "ya": "yes",
+  "nope": "no",
+  "nah": "no",
+  "u": "you",
+  "ur": "your",
+  "ur": "your",
+  "wanna": "want to",
+  "gonna": "going to",
+  "gotta": "got to",
+  "kinda": "kind of",
+  "dunno": "don't know",
+  "dnt": "don't",
+  "dont": "don't",
+  "cant": "can't",
+  "wont": "won't",
+  "shouldnt": "shouldn't",
+  "im": "i'm",
+  "im": "i'm",
+  "ive": "i've",
+  "shes": "she's",
+  "hes": "he's",
+  "theyre": "they're",
+  "thats": "that's",
+  "whats": "what's",
+  "whos": "who's",
+  "wheres": "where's",
+  "hows": "how's",
+  "lets": "let's",
+};
+
+// Smart text correction - understands common misspellings without correcting user input
+export function normalizeTextForAnalysis(text: string): string {
+  let normalized = text.toLowerCase();
+
+  // Replace common misspellings for better emotion detection
+  Object.entries(COMMON_MISSPELLINGS).forEach(([misspelled, correct]) => {
+    const regex = new RegExp(`\\b${misspelled}\\b`, "gi");
+    normalized = normalized.replace(regex, correct);
+  });
+
+  return normalized;
+}
 
 export interface EmotionAnalysisResult {
   emotion: string;
