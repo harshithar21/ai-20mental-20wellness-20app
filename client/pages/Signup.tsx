@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -12,80 +12,112 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const passwordRequirements = [
     { text: "At least 8 characters", met: password.length >= 8 },
-    { text: "Contains uppercase letter", met: /[A-Z]/.test(password) },
-    { text: "Contains lowercase letter", met: /[a-z]/.test(password) },
-    { text: "Contains a number", met: /[0-9]/.test(password) },
+    { text: "Uppercase letter", met: /[A-Z]/.test(password) },
+    { text: "Lowercase letter", met: /[a-z]/.test(password) },
+    { text: "Number", met: /[0-9]/.test(password) },
   ];
+
+  const allRequirementsMet = passwordRequirements.every((req) => req.met);
+  const passwordsMatch = password === confirmPassword && password.length > 0;
+  const isFormValid = name && email && allRequirementsMet && passwordsMatch;
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Please fill in all fields");
       return;
     }
 
-    const allMet = passwordRequirements.every((req) => req.met);
-    if (!allMet) {
-      setError("Password does not meet all requirements.");
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (!allRequirementsMet) {
+      setError("Password does not meet all requirements");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // TODO: Integrate with Supabase auth
-      // For now, just redirect to chat
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      setSuccess("✅ Account created successfully! Redirecting...");
       setTimeout(() => {
         navigate("/chat");
-        setIsLoading(false);
       }, 1000);
     } catch (err) {
-      setError("Failed to sign up. Please try again.");
+      setError("Failed to create account. Please try again.");
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignup = () => {
     setIsLoading(true);
-    // TODO: Integrate with Supabase Google auth
+    setError("");
+    setSuccess("");
+    // Simulate Google signup
     setTimeout(() => {
-      navigate("/chat");
-      setIsLoading(false);
-    }, 1000);
+      setSuccess("✅ Google signup successful!");
+      setTimeout(() => {
+        navigate("/chat");
+      }, 1000);
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-wellness flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 justify-center mb-8">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-wellness-400 to-wellness-600">
+        <Link to="/" className="flex items-center gap-2 justify-center mb-10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-wellness-600 shadow-md">
             <span className="text-lg font-bold text-white">💙</span>
           </div>
-          <span className="text-2xl font-bold text-foreground">MindCare</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-wellness-600 bg-clip-text text-transparent">MindCare</span>
         </Link>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-md-wellness border border-wellness-200 p-8">
+        <div className="bg-card rounded-3xl shadow-xl border border-border/50 p-8 backdrop-blur">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-foreground mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Create Your Account
             </h1>
-            <p className="text-muted-foreground">
-              Join us on your wellness journey
+            <p className="text-muted-foreground leading-relaxed">
+              Start your wellness journey with MindCare today
             </p>
           </div>
 
+          {/* Success message */}
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex gap-3">
+              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-800 font-medium">{success}</p>
+            </div>
+          )}
+
           {/* Error message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-800 font-medium">{error}</p>
             </div>
           )}
 
@@ -94,10 +126,13 @@ export default function Signup() {
             onClick={handleGoogleSignup}
             disabled={isLoading}
             variant="outline"
-            className="w-full mb-4 h-11"
+            className="w-full mb-4 h-12 border-2 font-semibold text-base hover:bg-muted/50"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Creating account...
+              </>
             ) : (
               <>
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -125,28 +160,28 @@ export default function Signup() {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full border-t border-border/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-muted-foreground">Or</span>
+              <span className="bg-card px-3 text-muted-foreground font-medium">Or register with email</span>
             </div>
           </div>
 
           {/* Email/Password Form */}
-          <form onSubmit={handleSignup} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">
+              <Label htmlFor="name" className="text-foreground font-semibold">
                 Full Name
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 <Input
                   id="name"
                   type="text"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="pl-10 h-11"
+                  className="pl-10 h-12 text-base bg-muted/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   disabled={isLoading}
                   required
                 />
@@ -154,18 +189,18 @@ export default function Signup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
+              <Label htmlFor="email" className="text-foreground font-semibold">
                 Email Address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-11"
+                  className="pl-10 h-12 text-base bg-muted/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   disabled={isLoading}
                   required
                 />
@@ -173,42 +208,49 @@ export default function Signup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
+              <Label htmlFor="password" className="text-foreground font-semibold">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-11"
+                  className="pl-10 pr-10 h-12 text-base bg-muted/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   disabled={isLoading}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
 
               {/* Password Requirements */}
-              <div className="space-y-2 mt-3 mb-4">
+              <div className="space-y-2 mt-4 p-4 bg-muted/30 rounded-lg border border-border/50">
                 {passwordRequirements.map((req, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-2 text-xs transition-colors"
                   >
-                    <CheckCircle
-                      className={`h-4 w-4 ${
-                        req.met
-                          ? "text-wellness-500"
-                          : "text-muted-foreground"
-                      }`}
-                    />
-                    <span
-                      className={
-                        req.met ? "text-wellness-600" : "text-muted-foreground"
-                      }
-                    >
+                    <div className={`h-4 w-4 rounded-full flex items-center justify-center ${
+                      req.met ? "bg-green-100" : "bg-muted"
+                    }`}>
+                      {req.met && (
+                        <CheckCircle className="h-3 w-3 text-green-600" />
+                      )}
+                    </div>
+                    <span className={req.met ? "text-green-700 font-medium" : "text-muted-foreground"}>
                       {req.text}
                     </span>
                   </div>
@@ -217,34 +259,61 @@ export default function Signup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground">
+              <Label htmlFor="confirmPassword" className="text-foreground font-semibold">
                 Confirm Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pl-10 h-11"
+                  className="pl-10 pr-10 h-12 text-base bg-muted/50 border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   disabled={isLoading}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
+              {confirmPassword && !passwordsMatch && (
+                <p className="text-xs text-red-600 font-medium flex items-center gap-1 mt-1">
+                  <AlertCircle className="h-3 w-3" />
+                  Passwords don't match
+                </p>
+              )}
+              {passwordsMatch && (
+                <p className="text-xs text-green-600 font-medium flex items-center gap-1 mt-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Passwords match!
+                </p>
+              )}
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full h-11 bg-primary hover:bg-wellness-600 text-primary-foreground gap-2 mt-6"
+              disabled={isLoading || !isFormValid || !!success}
+              className="w-full h-12 bg-primary hover:bg-wellness-600 text-primary-foreground gap-2 font-semibold text-base shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
               ) : (
                 <>
-                  Create Account <ArrowRight className="h-4 w-4" />
+                  Create Account
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </Button>
@@ -255,7 +324,7 @@ export default function Signup() {
             <span className="text-muted-foreground">Already have an account? </span>
             <Link
               to="/login"
-              className="text-wellness-600 hover:text-wellness-700 font-semibold"
+              className="text-primary hover:text-wellness-600 font-semibold transition-colors"
             >
               Sign in
             </Link>
@@ -263,8 +332,12 @@ export default function Signup() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          By signing up, you agree to our Terms of Service and Privacy Policy
+        <p className="text-center text-xs text-muted-foreground mt-8 leading-relaxed">
+          By creating an account, you agree to our
+          <br />
+          <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
+          {" and "}
+          <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
         </p>
       </div>
     </div>
