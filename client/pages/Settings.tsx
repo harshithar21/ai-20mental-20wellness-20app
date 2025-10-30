@@ -37,7 +37,7 @@ export default function Settings() {
   const [editAvatarOpen, setEditAvatarOpen] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(userProfile.avatar || "👤");
 
-  const avatarOptions = ["👤", "👨", "👩", "👨‍🦱", "👩‍🦱", "🧑", "😊", "🙂"];
+  const avatarOptions = ["👤", "��", "👩", "👨‍🦱", "👩‍🦱", "🧑", "😊", "🙂"];
 
   // Notification States
   const [notifications, setNotifications] = useState({
@@ -476,16 +476,6 @@ export default function Settings() {
                     <div className="flex items-center gap-2">
                       <Lock className="h-4 w-4" />
                       <span>Change Password</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between h-12 group hover:bg-primary/5 border-border/50"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      <span>Two-Factor Auth</span>
                     </div>
                     <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
